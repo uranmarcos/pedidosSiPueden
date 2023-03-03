@@ -1,0 +1,76 @@
+/* ESTILOS OPCIONES */
+/* .opciones a{
+    height: 30px;
+    margin: 20px 0 20px;
+    color: rgb(124, 69, 153);
+    font-weight: bolder;
+    width: 25%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+.opciones a:hover{
+    color: rgb(124, 69, 153);
+    border-bottom: solid 1px rgb(124, 69, 153);
+} */
+
+
+/*  ARCHIVO OPCIONS */
+.navContainer{
+    background-color:  rgb(124, 69, 153);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+}
+.navContainer a{
+    height: 40px;
+   
+    color: white;
+    font-weight: bolder;
+    width: 200px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+.navContainer a:hover{
+    font-size: 17px;
+   color: white
+  
+}
+a.nav-link{
+    margin: 0;
+    padding: 0;
+    width: 150px;
+    display: flex;
+    justify-content: center;
+}
+a.active{
+    background-color: white;
+    color:  rgb(124, 69, 153);
+    border-bottom: solid 1px rgb(124, 69, 153);
+}
+a.active:hover{
+    color:  rgb(124, 69, 153);
+}
+/* ESTILOS OPCIONES */
+
+img{
+    height: 9vh;
+    margin-top: 0.5vh;
+}
+.header{
+    height: 15vh;
+    border-bottom: 1px solid rgb(124, 69, 153);; 
+    display: flex;
+    justify-content: space-between;
+}
+.menu{
+    margin-top: 5px;;
+    background-color: white;
+    z-index: 2;
+    color: rgb(124, 69, 153) !important;
+    font-weight: bolder;
+    border: solid 1px rgb(124, 69, 153);
+    border-radius: 5px;
+    text-align: center;
+}

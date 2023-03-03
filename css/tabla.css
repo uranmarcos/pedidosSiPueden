@@ -1,0 +1,106 @@
+.breadcrumb{
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin:20px 0px;
+    color: grey;
+    font-weight: bolder;
+    
+}
+
+
+td{
+    text-align: center;
+    height: 50px;
+    line-height: 50px;
+}
+.sinResultados{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px 10px 20px;
+    text-align: center;
+}
+.botonAccion{
+    width: 40px;
+    height: 40px;
+    background-color: white;    
+    border-radius: 5px;
+    line-height: 15px;
+}
+.botonReset{
+    color: rgb(124, 69, 153);
+    border: solid 1px rgb(124, 69, 153);
+}
+.botonReset:hover{
+    color: white;
+    background-color: rgb(124, 69, 153);
+}
+.botonDelete{
+    color: rgb(238, 100, 100);
+    border: solid 1px rgb(238, 100, 100);;
+}
+.botonDelete:hover{
+    color: white;
+    background-color: rgb(238, 100, 100);
+}
+.botonEdit{
+    color: rgb(92, 165, 97);
+    border: solid 1px rgb(92, 165, 97);
+}
+.botonEdit:hover{
+    color: white;
+    background-color: rgb(92, 165, 97);
+}
+.contenedorTabla{
+    color: rgb(124, 69, 153);
+    border: solid 1px rgb(124, 69, 153);
+    border-radius: 10px;
+    padding: 10xp;
+    margin-top: 24px;
+    width: 100%;
+}
+.cardABM{
+    color: rgb(124, 69, 153);
+    border: solid 1px rgb(124, 69, 153);
+    border-radius: 10px;
+    padding: 40xp;
+    margin-top: 24px;
+    width: 100%;
+}
+.tituloColumna{
+    color: rgb(58, 57, 57);
+    text-align: center;
+}
+
+
+.boton{
+    min-width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    color: rgb(124, 69, 153);
+    text-transform: uppercase;
+    background-color: white;
+    border: solid 1px rgb(124, 69, 153);
+}
+.boton:hover{
+    color: rgb(124, 69, 153);
+    box-shadow: 3px 3px 3px rgb(124, 69, 153);
+}
+.botonConfirm{
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    color: rgb(92, 165, 97);
+    text-transform: uppercase;
+    background-color: white;
+    border: solid 1px rgb(92, 165, 97);
+}
+.botonConfirm:hover{
+    box-shadow: 3px 3px 3px rgb(92, 165, 97);
+    color: rgb(92, 165, 97);
+}
+.error{
+    border: solid 1px red;
+}
