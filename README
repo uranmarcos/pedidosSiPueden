@@ -1,1 +1,3 @@
-Version 2 del proyecto de pedidos
+Proyecto para pedido de materiales para las sedes de las distintas provincias.
+Se solicita un proyecto rápido, con un solo usuario compartido por las distintas sedes, que permita cargar los datos de envio y evitar la generacipon constante de nuevos usuarios, por la alta rotacion de los mismos.
+Desarrollado con Vue y PHP puro.
