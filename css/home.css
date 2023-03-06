@@ -1,0 +1,287 @@
+.header{
+    background-color:  rgb(124, 69, 153);
+    display: flex;
+    height: 15vh;
+    justify-content: center;
+    align-items: center;
+}
+img {
+    height: 14vh;
+}
+
+
+
+/*body  */
+body{
+    font-family: 'Courier New', Courier, monospace;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h6{
+    text-align: center;
+    color: grey;
+    font-size: 16px;
+    margin-top: 10px;
+}
+.card{
+    height: auto;
+    margin: 20px 0 20px;
+    display: flex;
+    padding-bottom: 20px;
+    align-items: center;
+}
+.cardPedido{
+    height: auto;
+    margin: 20px 0 20px;
+    display: flex;
+    padding-bottom: 20px;
+    align-items: center;
+}
+
+
+.subtituloCard{
+    color: rgb(124, 69, 153);
+    font-weight: bolder;
+    text-align: center;
+    width: calc(100% - 20px);
+    margin: 15px 10px;
+}
+.errorLabel{
+    color: red;
+    font-size: 10px;
+}
+.subtituloMaterial{
+    color: grey;
+    text-align: left;
+   
+}
+.contenedorSubtituloMaterial{
+    width: calc(100% - 20px);
+    margin: 0 auto 10px;
+    height: 30px;
+    border-bottom: 1px solid grey;
+    display: flex;
+    justify-content: space-between;
+}
+.btnSubtituloMaterial {
+    color: grey;
+    width: 100px;
+    height: 20px;
+    border: none;
+    line-height: 20px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+
+.boton{
+    min-width: 150px;
+    max-width: 300PX;
+    height: 40px;
+    border-radius: 10px;
+    color: rgb(124, 69, 153);
+    text-transform: uppercase;
+    background-color: white;
+    border: solid 1px rgb(124, 69, 153);
+}
+.boton:hover{
+    color: rgb(124, 69, 153);
+    box-shadow: 3px 3px 3px rgb(124, 69, 153);
+}
+
+.contenedorBoton{
+    width: 100%;
+    margin: auto;;
+}
+
+
+.btnCategoria{
+    color:white;
+    color: rgb(65, 63, 63);
+    font-weight: bolder;
+    width: 100%;
+    font-size: 14px;
+    background-image: url("../img/fondoBotonOscuro.png");
+    background-size: cover;
+    background-position: center;
+    height: 40px;
+    border: solid 1px grey;
+}
+.btnCategoriaSeleccionado{
+    color:  rgba(255, 255, 255, 1);;
+    font-weight: bolder;
+    text-shadow: black 0.1em 0.1em 0.2em;
+    width: 100%;
+    font-size: 14px;
+    background-image: url("../img/fondoBoton.png");
+    background-size: cover;
+    background-position: center;
+    height: 40px;
+    border: solid 1px grey;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+section{
+    border: solid 1px grey;
+    border-radius: 5px;
+}
+
+/* ESTILOS GENERALES PEDIDOS */
+.rowListado {
+    margin: auto;
+    width: 100%;;
+}
+.contenedorPrincipal{
+    width: 100%;
+    padding:0;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
+.rowBotones{
+    width: 100%;
+    margin: auto;
+    display: flex;
+    padding: 0;;
+    justify-content: space-between;
+}
+
+
+/* ESTILO ARTICULOS */
+.textoExplicacion{
+    width: 100%;
+    height: 100% !important;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    text-align: justify;
+    line-height: 25px;
+    align-items: center;
+    font-size: 16px;
+    flex-direction: column;
+}
+.imgDemo{
+    margin-top: 10px;
+    width: 100%;
+    height: auto;
+}
+.otros{
+    margin: 10px 2.5%;
+    padding: 5px;
+    width: 95%;
+    font-size: 12px;
+    min-height: 250px;
+    border: solid 1px grey;
+}
+textarea:focus{
+    outline: none;
+}
+.rowArticulo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin:10px 0 0;
+}
+.btnShow{
+    width: 30px;
+    height: 30px;
+    background-color: white;    
+    line-height: 15px;
+    border: none;
+    color:  grey;
+}
+.botonAccion{
+    width: 30px;
+    height: 30px;
+    background-color: white;    
+    border-radius: 5px;
+    line-height: 15px;
+}
+.botonDelete{
+    padding:0;
+    color: rgb(238, 100, 100);
+    border: solid 1px rgb(238, 100, 100);;
+}
+.checkboxNoMedible{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+input:checked ~ .checkmark {
+    background-color: green;
+    }
+.botonDelete:hover{
+    color: white;
+    background-color: rgb(238, 100, 100);
+}
+
+.labelArticulo{
+    text-align: left;
+}
+.divInputCantidad{
+    position: relative;
+    padding: 0;
+}
+.inputCantidad{
+    text-align: right;
+    border: solid 1px rgb(124, 69, 153);
+    border-radius: 5px;
+    height: 30px;
+    width: 100%;
+}
+.labelNoMedible{
+    border: solid 1px rgb(124, 69, 153);
+    border-radius: 5px;
+    height: 30px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    color: grey;
+    padding-right: 30px;
+
+    width: 100%;
+}
+.inputCantidad:focus{
+    outline: none;
+}
+.labelCantidad{
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    font-size: 14px;
+    background-color: white;
+    color:rgb(124, 69, 153);
+}
+.subtituloTodasCategorias{
+    width: 95%;
+    margin: auto;
+    color: grey;
+    border-bottom: solid 1px grey;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/*  ESTILOS TU PEDIDO */
+.itemListado {
+    font-size: 12px;
+    z-index: 5;
+    color: black;
+    word-wrap: break-word;
+}
+ul{
+    margin: 0;
+    padding: 0 10px;
+    list-style: none;
+}  
+ul li:before {
+  content: '✓';
+} 
+
+h6{
+  color: grey;
+  text-align: center;
+  font-weight: bolder;
+  font-size: 14px;
+}

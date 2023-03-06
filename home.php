@@ -8,9 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.21/vue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link href="css/tabla.css" rel="stylesheet">
-    <link href="css/opciones.css" rel="stylesheet">
-    <link href="css/modal.css" rel="stylesheet">
+   
+    <link href="css/home.css" rel="stylesheet">
   
  
 </head>
@@ -20,37 +19,153 @@
         
         <div class="container">
             <div class="row mt-6">
-              <div class="col-md-6 col-sm-10">
-                <div class="opciones" @click="irA('usuarios')">
-                    Usuarios
+                <div class="col-12">
+                    <div class="card" v-if="!pedido">
+                        <span class="subtituloCard">DATOS PARA EL ENVIO</span>
+                        <div class="px-3 mt-3 row">
+                            <div class="col-sm-12 col-md-6">
+                                <label for="nombre">Nombre Sí Pueden (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
+                                <input class="form-control" maxlength="30" id="nombre" v-model="nombre">
+                            </div>
+                            <div class="col-sm-12 col-md-6 mt-sm-3 mt-md-0">
+                                <label for="direccion">Dirección de envio (*)<span class="errorLabel" v-if="errorDireccion">{{errorDireccion}}</span></label>
+                                <input class="form-control" maxlength="50" id="direccion" v-model="direccion">
+                            </div>
+                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                                <label for="ciudad">Ciudad (*) <span class="errorLabel" v-if="errorCiudad">{{errorCiudad}}</span></label>
+                                <input class="form-control" maxlength="30" id="ciudad" v-model="ciudad">
+                            </div>
+                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                                <label for="provincia">Provincia (*) <span class="errorLabel" v-if="errorProvincia">{{errorProvincia}}</span></label>
+                                <input class="form-control" maxlength="30" id="provincia" v-model="provincia">
+                            </div>
+                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                                <label for="ciudad">Código Postal (*) <span class="errorLabel" v-if="errorCodigoPostal">{{errorCodigoPostal}}</span></label>
+                                <input class="form-control" maxlength="8" id="codigoPostal" v-model="codigoPostal">
+                            </div>
+                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                                <label for="provincia">Teléfono (*) <span class="errorLabel" v-if="errorTelefono">{{errorTelefono}}</span></label>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <input class="form-control" maxlength="4" id="telefono" v-model="telefono">
+                                    </div> 
+                                    <div class="col-sm-1">
+                                        -
+                                    </div> 
+                                    <div class="col-sm-8">
+                                        <input class="col-sm-9 form-control" maxlength="9" id="telefono" v-model="telefono">
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                        <div class="px-3 mt-3 row">
+                            <button type="button" @click="continuar()" class="btn boton">
+                                Continuar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row rowListado" v-if="pedido">
+                        <span class="subtituloCard">LISTADO DE MATERIALES</span>
+                        
+                        <div class="contenedorPrincipal">
+
+                            <section class="col-3 px-0 mr-1">
+                            
+                                <div class="row contenedorBoton" v-for="item in categorias" >
+                                    <button :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" @click="changeCategoria(item)">{{item.descripcion}}</button>
+                                    
+                                </div>
+                               
+                            </section>
+
+                            <section class="col-5">
+                                <article  v-if="categoria != null" class="pb-3">
+                                    <h6> {{tituloCategoria}} </h6>
+                                    <div v-for="articulo in listadoPedido">
+                                        <div v-if="articulo.categoria == categoria">
+                                            <div class="row rowArticulo" v-if="articulo.medible">
+                                                <div class="col-10 divInputCantidad">
+                                                    <input 
+                                                        @input="changeCantidad(articulo.nombre, articulo.cantidad)"
+                                                        type="number" 
+                                                        class="inputCantidad" 
+                                                        autocomplete="off" 
+                                                        min="0" 
+                                                        maxlength="4" 
+                                                        max="9999" 
+                                                        :placeholder="articulo.descripcion + '  '"
+                                                        v-model="articulo.cantidad"
+                                                    >
+                                                    <span class="labelCantidad" v-if="articulo.cantidad != null"> {{ articulo.descripcion}}</span>
+                                                </div>
+                                                <button class="botonAccion botonDelete col-1" @click="articulo.cantidad = null">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eraser-fill" viewBox="0 0 16 16">
+                                                        <path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div v-else>
+                                                <div class="row rowArticulo" v-if="articulo.categoria != 'otros'">
+                                                    <div class="col-10 divInputCantidad">
+                                                        <label class="labelNoMedible">{{articulo.descripcion}}</label>
+                                                    </div>
+                                                    <div class="col-1 checkboxNoMedible">
+                                                        <input type="checkbox" v-model="articulo.cantidad">
+                                                    </div>
+                                                </div>
+                                                <div class="row rowArticulo" v-else>
+                                                    <textarea class="otros" v-model="articulo.cantidad"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                                <article v-if="categoria == null" class="textoExplicacion">
+                                    <div>
+                                        Seleccionando las categorias de la izquierda podrás visualizar las opciones disponibles e ingresar la cantidad.
+                                        Si el articulo no se puede contar, debes tildarlo en caso de necesitarlo.
+                                        <br>
+                                        En "EXTRAS" encontrarás los articulos no agrupados en ninguna categoria.
+                                        <br>
+                                        En "OTROS" podrás escribir si necesitás algo que no está en el listado.
+                                    </div>
+                                        <img src="img/demo.png" class="imgDemo">
+                                    
+                                </article>
+                            </section>
+
+                            <section class="col-3 sectionPedido">
+                                <h6>TU PEDIDO:</h6>
+                                <ul  v-for="articulo in listadoPedido">
+
+                                    <li v-if="articulo.cantidad != null && articulo.cantidad != 0" class="itemListado">
+                                       {{articulo.nombre}} {{articulo.medible || articulo.categoria == 'otros' ? ': ' + articulo.cantidad : ''}}
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+
+
+                     
+                        <div class="mt-3 row rowBotones">
+                            <button type="button" @click="pedido = false" class="btn boton">
+                                Volver a datos de envio
+                            </button>
+                            <button type="button" @click="continuar()" class="btn boton">
+                                Enviar
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-6 col-sm-10"  @click="irA('articulos')">
-                <div class="opciones">
-                    Articulos
-                </div>
-              </div>
-              <div class="col-md-6 col-sm-10"  @click="irA('sedes')">
-                <div class="opciones">
-                    Sedes
-                </div>
-              </div>
+              
             </div>
           </div>
     </div>
 
     <style scoped>
-        .opciones{
-            border: solid 1px purple;
-            border-radius: 10px;
-            color: purple;
-            text-transform: uppercase;
-            width: 200px;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+   
             
     </style>
     <script>
@@ -60,33 +175,181 @@
                 
             },
             data: {
-                items: [
-                    { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-                    { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-                    { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                    { age: 38, first_name: 'Jami', last_name: 'Carney' }
+                pedido: false,
+                nombre: null,
+                direccion: null,
+                ciudad: null,
+                provincia: null,
+                codigoPostal: null,
+                telefono: null,
+                errorNombre: null,
+                errorDireccion: null,
+                errorCiudad: null,
+                errorProvincia: null,
+                errorTelefono: null,
+                errorCodigoPostal: null,
+                listadoPedido: [
+                    {medible: true, categoria: "afiches", nombre: "Afiche amarillo", descripcion: "Amarillo", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche blanco", descripcion: "Blanco", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche celeste", descripcion: "Celeste", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche naranja", descripcion: "Naranja", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche rojo", descripcion: "Rojo", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche rosa", descripcion: "Rosa", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "afiches", nombre: "Afiche violeta", descripcion: "Violeta", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina amarilla", descripcion: "Amarilla", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina blanca", descripcion: "Blanca", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina celeste", descripcion: "Celeste", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina naranja", descripcion: "Naranja", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina negra", descripcion: "Negra", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina roja", descripcion: "Roja", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina rosa", descripcion: "Rosa", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "cartulinas", nombre: "Cartulina violeta", descripcion: "Violeta", cantidad: null},
+                    {medible: true, categoria: "fibronesPizarra", nombre:"Fibrón para pizarra azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "fibronesPizarra", nombre:"Fibrón para pizarra negro", descripcion: "Negro", cantidad: null},
+                    {medible: true, categoria: "fibronesPizarra", nombre:"Fibrón para pizarra rojo", descripcion: "Rojo", cantidad: null},
+                    {medible: true, categoria: "fibronesPizarra", nombre:"Fibrón para pizarra verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "fibronesPermanentes", nombre:"Fibrón permanente azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "fibronesPermanentes", nombre:"Fibrón permanente negro", descripcion: "Negro", cantidad: null},
+                    {medible: true, categoria: "fibronesPermanentes", nombre:"Fibrón permanente rojo", descripcion: "Rojo", cantidad: null},
+                    {medible: true, categoria: "fibronesPermanentes", nombre:"Fibrón permanente verde", descripcion: "Verde", cantidad: null}, 
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva amarilla", descripcion: "Amarilla", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva blanca", descripcion: "Blanca", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva celeste", descripcion: "Celeste", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva naranja", descripcion: "Naranja", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva negra", descripcion: "Negra", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva roja", descripcion: "Roja", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva rosa", descripcion: "Rosa", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "gomaEva", nombre: "Goma eva violeta", descripcion: "Violeta", cantidad: null},
+                    {medible: true, categoria: "lapiceras", nombre:"Lapicera azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "lapiceras", nombre:"Lapicera negra", descripcion: "Negra", cantidad: null},
+                    {medible: true, categoria: "lapiceras", nombre:"Lapicera roja", descripcion: "Roja", cantidad: null},
+                    {medible: true, categoria: "lapiceras", nombre:"Lapicera verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe amarillo", descripcion: "Amarillo", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe blanco", descripcion: "Blanco", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe celeste", descripcion: "Celeste", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe naranja", descripcion: "Naranja", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe rojo", descripcion: "Rojo", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe rosa", descripcion: "Rosa", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "papelCrepe", nombre:"Papel crepe violeta", descripcion: "violeta", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera amarilla", descripcion: "Amarilla", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera azul", descripcion: "Azul", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera blanca", descripcion: "Blanca", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera celeste", descripcion: "Celeste", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera marron", descripcion: "Marrón", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera negra", descripcion: "Negra", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera roja", descripcion: "Roja", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera rosa", descripcion: "Rosa", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera verde", descripcion: "Verde", cantidad: null},
+                    {medible: true, categoria: "temperas", nombre:"Tempera violeta", descripcion: "Violeta", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Botones", descripcion: "Botones", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Brillantina", descripcion: "Brillantina", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Caja x 6  Lápices  de colores", descripcion: "Caja x 6  Lápices  de colores", cantidad: null}, 
+                    {medible: false, categoria: "extras", nombre:"Canutillos/mostacillas", descripcion: "Canutillos/mostacillas", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Cinta papel", descripcion: "Cinta papel", cantidad: null}, 
+                    {medible: true, categoria: "extras", nombre:"Cinta embalar", descripcion: "Cinta embalar", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Cinta scotch", descripcion: "Cinta scotch", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Crayones de colores", descripcion: "Crayones de colores", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Elástico", descripcion: "Elástico", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Fibras de colores", descripcion: "Fibras de colores", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Globos", descripcion: "Globos", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Gomas de borrar", descripcion: "Gomas de borrar", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Hilo de algodón", descripcion: "Hilo de algodón", cantidad: null}, 
+                    {medible: false, categoria: "extras", nombre:"Hilo Sisal", descripcion: "Hilo Sisal", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Lana", descripcion: "Lana", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Lentejuelas", descripcion: "Lentejuelas", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Palitos de helado", descripcion: "Palitos de helado", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Papel glasé", descripcion: "Papel glasé", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Pegamento Unipox", descripcion: "Pegamento Unipox", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Pinceles", descripcion: "Pinceles", cantidad: null}, 
+                    {medible: true, categoria: "extras", nombre:"Pistolita silicona", descripcion: "Pistolita silicona", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Pistolita silicona repuesto", descripcion: "Pistolita silicona repuesto", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Plásticolas", descripcion: "Plásticolas", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Plasticolas de colores", descripcion: "Plasticolas de colores", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Plastilina", descripcion: "Plastilina", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Resmas A4", descripcion: "Resmas A4", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Sacapuntas", descripcion: "Sacapuntas", cantidad: null},
+                    {medible: false, categoria: "extras", nombre:"Tanza", descripcion: "Tanza", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Tijeras adultos", descripcion: "Tijeras adultos", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Tijeras infantiles", descripcion: "Tijeras infantiles", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Tizas blancas", descripcion: "Tizas blancas", cantidad: null},
+                    {medible: true, categoria: "extras", nombre:"Tizas de colores", descripcion: "Tizas de colores", cantidad: null},
+                    {medible: false, categoria: "otros", nombre:"Otros", descripcion: "Otros", cantidad: null}
+                ],
+                categoria: null,
+                tituloCategoria: null,
+                categorias: [
+                    {id: "afiches", descripcion: "AFICHES"}, 
+                    {id: "cartulinas", descripcion: "CARTULINAS"},
+                    {id: "fibronesPizarra", descripcion: "FIBRONES PARA PIZARRA"},
+                    {id: "fibronesPermanentes", descripcion: "FIBRONES PERMANENTES"},
+                    {id: "gomaEva", descripcion: "GOMA EVA"},
+                    {id: "lapiceras", descripcion: "LAPICERAS"}, 
+                    {id: "papelCrepe", descripcion: "PAPEL CREPE"},
+                    {id: "temperas", descripcion: "TEMPERAS"},
+                    {id: "extras", descripcion: "EXTRAS"},
+                    {id: "otros", descripcion: "OTROS"}
                 ]
             },
             methods:{
-                irA(param) {
-                    console.log(param)
-                    switch (param) {
-                        case "usuarios":
-                            window.location.href = 'http://localhost/proyectos/pedidos2/secciones/usuarios.php';         
-                            break;
-                    
-                        case "articulos":
-                            window.location.href = 'http://localhost/proyectos/pedidos2/secciones/articulos.php';         
-                            break;
-
-                        case "sedes":
-                            window.location.href = 'http://localhost/proyectos/pedidos2/secciones/sedes.php';         
-                            break;
-
-                        default:
-                            break;
+                changeCategoria (param) {
+                    this.categoria = param.id;
+                    this.tituloCategoria = this.categorias.filter(element => element.id == param.id)[0].descripcion;
+                },
+                changeCantidad (nombre, cantidad) {
+                    if (cantidad.length > 4) {
+                        let cantidadModificada = cantidad.slice(0,4);
+                        this.listadoPedido.filter(element => element.nombre == nombre)[0].cantidad = cantidadModificada;
                     }
-                }
+                },
+                continuar () {
+                    this.pedido = true;
+                    return
+                    this.resetErrores();
+                    if (this.nombre != null && this.nombre.trim() != '' &&
+                        this.direccion != null && this.direccion.trim() != '' &&
+                        this.ciudad != null && this.ciudad.trim() != '' &&
+                        this.provincia != null && this.provincia.trim() != '' &&
+                        this.codigoPostal != null && this.codigoPostal.trim() != '' &&
+                        this.telefono != null && this.telefono.trim() != '')
+                        {
+                            this.pedido = true
+                        } else {
+                            if (this.nombre == null || this.nombre.trim() == '') {
+                                this.errorNombre = "Campo requerido";
+                            }
+                            if (this.direccion == null || this.direccion.trim() == '') {
+                                this.errorDireccion = "Campo requerido";
+                            }
+                            if (this.ciudad == null || this.ciudad.trim() == '') {
+                                this.errorCiudad = "Campo requerido";
+                            }
+                            if (this.provincia == null || this.provincia.trim() == '') {
+                                this.errorProvincia = "Campo requerido";
+                            }
+                            if (this.codigoPostal == null || this.codigoPostal.trim() == '') {
+                                this.errorCodigoPostal = "Campo requerido";
+                            }
+                            if (this.telefono == null || this.telefono.trim() == '') {
+                                this.errorTelefono = "Campo requerido";
+                            }
+                        }
+                },
+                resetErrores() {
+                    this.errorNombre= null
+                    this.errorDireccion= null
+                    this.errorCiudad= null
+                    this.errorProvincia= null
+                    this.errorTelefono= null
+                    this.errorCodigoPostal= null                }
+
             }
         })
     </script>
