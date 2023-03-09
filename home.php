@@ -7,8 +7,12 @@
     <title>SI PEDIDOS</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.21/vue.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <link href="css/home.css" rel="stylesheet">
   
  
@@ -25,62 +29,85 @@
                         <div class="px-3 mt-3 row">
                             <div class="col-sm-12 col-md-6">
                                 <label for="nombre">Nombre Sí Pueden (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
-                                <input class="form-control" maxlength="30" id="nombre" v-model="nombre">
+                                <input class="form-control" maxlength="30" id="nombre" v-model="envio.nombre">
                             </div>
-                            <div class="col-sm-12 col-md-6 mt-sm-3 mt-md-0">
+                            <div class="col-sm-12 col-md-6 mt-3 mt-md-0">
                                 <label for="direccion">Dirección de envio (*)<span class="errorLabel" v-if="errorDireccion">{{errorDireccion}}</span></label>
-                                <input class="form-control" maxlength="50" id="direccion" v-model="direccion">
+                                <input class="form-control" maxlength="50" id="direccion" v-model="envio.direccion">
                             </div>
-                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                            <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="ciudad">Ciudad (*) <span class="errorLabel" v-if="errorCiudad">{{errorCiudad}}</span></label>
-                                <input class="form-control" maxlength="30" id="ciudad" v-model="ciudad">
+                                <input class="form-control" maxlength="30" id="ciudad" v-model="envio.ciudad">
                             </div>
-                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                            <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="provincia">Provincia (*) <span class="errorLabel" v-if="errorProvincia">{{errorProvincia}}</span></label>
-                                <input class="form-control" maxlength="30" id="provincia" v-model="provincia">
+                                <input class="form-control" maxlength="30" id="provincia" v-model="envio.provincia">
                             </div>
-                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                            <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="ciudad">Código Postal (*) <span class="errorLabel" v-if="errorCodigoPostal">{{errorCodigoPostal}}</span></label>
-                                <input class="form-control" maxlength="8" id="codigoPostal" v-model="codigoPostal">
+                                <input class="form-control" maxlength="8" id="codigoPostal" v-model="envio.codigoPostal">
                             </div>
-                            <div class="col-sm-12 col-md-6 mt-sm-3">
+                            <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="provincia">Teléfono (*) <span class="errorLabel" v-if="errorTelefono">{{errorTelefono}}</span></label>
                                 <div class="row">
-                                    <div class="col-sm-3">
-                                        <input class="form-control" maxlength="4" id="telefono" v-model="telefono">
+                                    <div class="col-3">
+                                        <input class="form-control" maxlength="4" id="telefono" v-model="envio.caracteristica">
                                     </div> 
-                                    <div class="col-sm-1">
+                                    <div class="col-1">
                                         -
                                     </div> 
-                                    <div class="col-sm-8">
-                                        <input class="col-sm-9 form-control" maxlength="9" id="telefono" v-model="telefono">
+                                    <div class="col-8">
+                                        <input class="col-sm-9 form-control" maxlength="9" id="telefono" v-model="envio.telefono">
                                     </div>
                                 </div>
-                            
                             </div>
                         </div>
-                        <div class="px-3 mt-3 row">
-                            <button type="button" @click="continuar()" class="btn boton">
-                                Continuar
-                            </button>
+                        <div class="px-3 mt-3 row rowBotonesEnvio">
+                            <div class="col-6 p-0">
+                                <input type="checkbox" v-model="recordarDatos">
+                                <label>Recordar</label>
+                            </div>
+                            <div class="col-6 pr-0 d-flex justify-content-end">
+                                <button type="button" @click="continuar()" class="btn boton">
+                                    Continuar
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row rowListado" v-if="pedido">
+                    <div class="card" v-if="pedido">
                         <span class="subtituloCard">LISTADO DE MATERIALES</span>
-                        
-                        <div class="contenedorPrincipal">
-
-                            <section class="col-3 px-0 mr-1">
-                            
+                        <div class="row rowListado contenedorPrincipal" >             
+                            <!-- START LISTADO CATEGORIAS NORMAL -->
+                            <section class="col-12 col-md-3 px-0 mr-1 categorias">
                                 <div class="row contenedorBoton" v-for="item in categorias" >
-                                    <button :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" @click="changeCategoria(item)">{{item.descripcion}}</button>
-                                    
+                                    <button :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" @click="changeCategoria(item)">
+                                        <span :class="categoria == item.id ? 'textoBtnRemarcado' : ''">
+                                            {{item.descripcion}}
+                                        </span>
+                                    </button>
                                 </div>
-                               
                             </section>
+                            <!-- END LISTADO CATEGORIAS NORMAL -->
 
-                            <section class="col-5">
+                            <!-- START LISTADO CATEGORIAS RESPONSIVE -->
+                            <section class="col-12 px-0 mr-1 categoriasResponsive">
+                                <p>
+                                    <button :class="categoria != null ? 'btnCategoriaSeleccionado' : 'btnCategoria'" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                        CATEGORIAS
+                                    </button>
+                                </p>
+                                <div class="collapse" id="collapseExample"> 
+                                    <div class="card card-body">
+                                        <div class="row contenedorBoton" v-for="item in categorias" >
+                                            <button :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" @click="changeCategoria(item)">{{item.descripcion}}</button>
+                                        </div>                                        
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- END LISTADO CATEGORIAS RESPONSIVE -->
+
+                            <section class="col-12 col-md-5" v-if="categoria">
                                 <article  v-if="categoria != null" class="pb-3">
                                     <h6> {{tituloCategoria}} </h6>
                                     <div v-for="articulo in listadoPedido">
@@ -122,51 +149,88 @@
                                         </div>
                                     </div>
                                 </article>
-                                <article v-if="categoria == null" class="textoExplicacion">
-                                    <div>
-                                        Seleccionando las categorias de la izquierda podrás visualizar las opciones disponibles e ingresar la cantidad.
-                                        Si el articulo no se puede contar, debes tildarlo en caso de necesitarlo.
-                                        <br>
-                                        En "EXTRAS" encontrarás los articulos no agrupados en ninguna categoria.
-                                        <br>
-                                        En "OTROS" podrás escribir si necesitás algo que no está en el listado.
-                                    </div>
-                                        <img src="img/demo.png" class="imgDemo">
-                                    
-                                </article>
                             </section>
 
-                            <section class="col-3 sectionPedido">
+                            <section class="col-12 sectionPedido" :class="categoria ? 'col-md-3' : 'col-md-9'">
                                 <h6>TU PEDIDO:</h6>
-                                <ul  v-for="articulo in listadoPedido">
-
-                                    <li v-if="articulo.cantidad != null && articulo.cantidad != 0" class="itemListado">
-                                       {{articulo.nombre}} {{articulo.medible || articulo.categoria == 'otros' ? ': ' + articulo.cantidad : ''}}
-                                    </li>
-                                </ul>
+                                <div class="mb-3">
+                                    <ul  v-for="articulo in listadoPedido">
+                                        <li v-if="articulo.cantidad != null && articulo.cantidad != 0" class="itemListado">
+                                            {{articulo.nombre}} {{articulo.medible || articulo.categoria == 'otros' ? ': ' + articulo.cantidad : ''}}
+                                        </li>
+                                    </ul>
+                                </div>
                             </section>
                         </div>
-
-
                      
-                        <div class="mt-3 row rowBotones">
+                        <div class="mt-3 row rowBotones p-3">
                             <button type="button" @click="pedido = false" class="btn boton">
-                                Volver a datos de envio
+                                Volver
                             </button>
-                            <button type="button" @click="continuar()" class="btn boton">
+                            <button type="button" :disabled="habilitarBtnEnviar()" class="btn boton" data-toggle="modal" data-target="#Modal">
                                 Enviar
                             </button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header  d-flex justify-content-center">
+                                <h5 class="modal-title" id="ModalLabel">CONFIRMACIÓN</h5>
+                            </div>
+                            <div class="modal-body d-flex justify-content-center">
+                                ¿Desea enviar el pedido?
+                            </div>
+                            <div class="modal-footer d-flex justify-content-between">
+                                <button type="button" class="btn boton" data-dismiss="modal">Cancelar</button>
+                                <button type="button" @click="confirmar()" class="btn boton" v-if="!loading">
+                                    Confirmar
+                                </button>
+                                <button 
+                                    class="btn boton"
+                                    v-if="loading" 
+                                >
+                                    <div class="loading">
+                                        <div class="spinner-border" role="status">
+                                            <span class="sr-only"></span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
               
             </div>
-          </div>
+        </div>
     </div>
 
     <style scoped>
-   
-            
+        .categorias{
+            display: none;
+        }
+        .categoriasResponsive{
+            display: block;
+        }
+        @media (min-width: 768px) {
+            .contenedorPrincipal{
+                width: 100%;
+                padding:0 5px;
+                height: auto;
+                margin: auto;
+                display: flex;
+                justify-content: space-between;
+            }
+            .categorias{
+                display: block;
+            }
+            .categoriasResponsive{
+                display: none;
+            }
+        }        
     </style>
     <script>
         var app = new Vue({
@@ -175,13 +239,18 @@
                 
             },
             data: {
+                loading: false,
+                recordarDatos: false,
                 pedido: false,
-                nombre: null,
-                direccion: null,
-                ciudad: null,
-                provincia: null,
-                codigoPostal: null,
-                telefono: null,
+                envio: {
+                    nombre: null,
+                    direccion: null,
+                    ciudad: null,
+                    provincia: null,
+                    codigoPostal: null,
+                    caracteristica: null,
+                    telefono: null,
+                },
                 errorNombre: null,
                 errorDireccion: null,
                 errorCiudad: null,
@@ -299,6 +368,9 @@
                 ]
             },
             methods:{
+                habilitarBtnEnviar () {
+                    return this.listadoPedido.find(element => element.cantidad != null) == undefined;
+                },
                 changeCategoria (param) {
                     this.categoria = param.id;
                     this.tituloCategoria = this.categorias.filter(element => element.id == param.id)[0].descripcion;
@@ -313,31 +385,37 @@
                     this.pedido = true;
                     return
                     this.resetErrores();
-                    if (this.nombre != null && this.nombre.trim() != '' &&
-                        this.direccion != null && this.direccion.trim() != '' &&
-                        this.ciudad != null && this.ciudad.trim() != '' &&
-                        this.provincia != null && this.provincia.trim() != '' &&
-                        this.codigoPostal != null && this.codigoPostal.trim() != '' &&
-                        this.telefono != null && this.telefono.trim() != '')
+                    if (this.envio.nombre != null && this.envio.nombre.trim() != '' &&
+                        this.envio.direccion != null && this.envio.direccion.trim() != '' &&
+                        this.envio.ciudad != null && this.envio.ciudad.trim() != '' &&
+                        this.envio.provincia != null && this.envio.provincia.trim() != '' &&
+                        this.envio.codigoPostal != null && this.envio.codigoPostal.trim() != '' &&
+                        this.envio.caracteristica != null && this.envio.caracteristica.trim() != '' &&
+                        this.envio.telefono != null && this.envio.telefono.trim() != '')
                         {
-                            this.pedido = true
+                            this.pedido = true;
+                            if (this.recordarDatos) {
+                                localStorage.setItem("datosEnvio", this.envio)
+                            } else {
+                                localStorage.removeItem("datosEnvio")
+                            }
                         } else {
-                            if (this.nombre == null || this.nombre.trim() == '') {
+                            if (this.envio.nombre == null || this.envio.nombre.trim() == '') {
                                 this.errorNombre = "Campo requerido";
                             }
-                            if (this.direccion == null || this.direccion.trim() == '') {
+                            if (this.envio.direccion == null || this.envio.direccion.trim() == '') {
                                 this.errorDireccion = "Campo requerido";
                             }
-                            if (this.ciudad == null || this.ciudad.trim() == '') {
+                            if (this.envio.ciudad == null || this.envio.ciudad.trim() == '') {
                                 this.errorCiudad = "Campo requerido";
                             }
-                            if (this.provincia == null || this.provincia.trim() == '') {
+                            if (this.envio.provincia == null || this.envio.provincia.trim() == '') {
                                 this.errorProvincia = "Campo requerido";
                             }
-                            if (this.codigoPostal == null || this.codigoPostal.trim() == '') {
+                            if (this.envio.codigoPostal == null || this.envio.codigoPostal.trim() == '') {
                                 this.errorCodigoPostal = "Campo requerido";
                             }
-                            if (this.telefono == null || this.telefono.trim() == '') {
+                            if (this.envio.caracteristica == null || this.envio.caracteristica.trim() == '' || this.envio.telefono == null || this.envio.telefono.trim() == '') {
                                 this.errorTelefono = "Campo requerido";
                             }
                         }
@@ -348,7 +426,36 @@
                     this.errorCiudad= null
                     this.errorProvincia= null
                     this.errorTelefono= null
-                    this.errorCodigoPostal= null                }
+                    this.errorCodigoPostal= null                
+                },
+                confirmar () {
+                    this.loading= true;
+                    // let formdata = new FormData();
+                    // formdata.append("usuario", app.usuario);
+                    // formdata.append("password", app.password);
+                    // axios.post("http://localhost/proyectos/pedidosSiPueden/conexion/login.php?accion=login", formdata)
+                    //     // axios.post("conexion/login.php?accion=login", formdata)
+                    //     .then(function(response){
+                    //         console.log(response.data);
+                    //         if (response.data.error) {
+                    //             app.mostrarToast("Error", response.data.mensaje);
+                    //         } else {
+                    //             if (app.recordar) {
+                    //                 localStorage.setItem("usuario", app.usuario)
+                    //             } else {
+                    //                 localStorage.removeItem("usuario", app.usuario)
+                    //             }
+                    //             window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
+                    //             // window.location.href = 'home.php'; 
+                                
+                    //         }
+                    //         app.loading = false;
+                    //     }).catch( error => {
+                    //         app.loading = false;
+                    //         app.mostrarToast("Error", response.data.mensaje);
+                    //     })
+                    
+                }
 
             }
         })

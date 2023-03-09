@@ -10,6 +10,25 @@ img {
 }
 
 
+     /* ESTILOS LOADING */
+     .contenedorLoading {
+        color: rgb(124, 69, 153);
+        border: solid 1px rgb(124, 69, 153);
+        border-radius: 10px;
+        padding: 10xp;
+        margin-top: 24px;
+        width: 100%;
+        height: 200px;
+    }
+    .loading {
+        width: 100%;
+        height: 100% !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    /* ESTILOS LOADING */
+
 
 /*body  */
 body{
@@ -75,8 +94,7 @@ h6{
 
 
 .boton{
-    min-width: 150px;
-    max-width: 300PX;
+    width: auto;
     height: 40px;
     border-radius: 10px;
     color: rgb(124, 69, 153);
@@ -95,24 +113,35 @@ h6{
 }
 
 
+
 .btnCategoria{
     color:white;
     color: rgb(65, 63, 63);
     font-weight: bolder;
     width: 100%;
     font-size: 14px;
+    font-size: 0.7em;
     background-image: url("../img/fondoBotonOscuro.png");
     background-size: cover;
     background-position: center;
     height: 40px;
     border: solid 1px grey;
 }
+.textoBtnRemarcado{
+    background-color: rgba(12, 12, 12, 0.5);
+    padding: 2px;
+}
 .btnCategoriaSeleccionado{
     color:  rgba(255, 255, 255, 1);;
     font-weight: bolder;
-    text-shadow: black 0.1em 0.1em 0.2em;
+    text-shadow: black 0.1em 0.1em 0.7em;
+    text-shadow: 3px 3px 3px black;
+    /* //-webkit-text-stroke: 0.1px black;
+    color: white; */
+    background-color: black;
     width: 100%;
     font-size: 14px;
+    font-size: 0.8em;
     background-image: url("../img/fondoBoton.png");
     background-size: cover;
     background-position: center;
@@ -129,15 +158,10 @@ section{
 /* ESTILOS GENERALES PEDIDOS */
 .rowListado {
     margin: auto;
-    width: 100%;;
-}
-.contenedorPrincipal{
     width: 100%;
-    padding:0;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
+    height: auto;
 }
+
 .rowBotones{
     width: 100%;
     margin: auto;
@@ -146,6 +170,17 @@ section{
     justify-content: space-between;
 }
 
+
+
+
+/* ESTILO ENVIO */
+.rowBotonesEnvio{
+    width: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 /* ESTILO ARTICULOS */
 .textoExplicacion{

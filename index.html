@@ -268,6 +268,7 @@
                         formdata.append("usuario", app.usuario);
                         formdata.append("password", app.password);
                         axios.post("http://localhost/proyectos/pedidosSiPueden/conexion/login.php?accion=login", formdata)
+                        // axios.post("conexion/login.php?accion=login", formdata)
                         .then(function(response){
                             console.log(response.data);
                             if (response.data.error) {
@@ -279,6 +280,8 @@
                                     localStorage.removeItem("usuario", app.usuario)
                                 }
                                 window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
+                                // window.location.href = 'home.php'; 
+                                
                             }
                             app.loading = false;
                         }).catch( error => {
