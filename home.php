@@ -14,6 +14,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <link href="css/home.css" rel="stylesheet">
+    <link href="css/notificacion.css" rel="stylesheet">
   
  
 </head>
@@ -186,9 +187,11 @@
                             </div>
                             <div class="modal-footer d-flex justify-content-between">
                                 <button type="button" class="btn boton" data-dismiss="modal">Cancelar</button>
+                                
                                 <button type="button" @click="confirmar()" class="btn boton" v-if="!loading">
                                     Confirmar
                                 </button>
+
                                 <button 
                                     class="btn boton"
                                     v-if="loading" 
@@ -202,10 +205,26 @@
                             </div>
                         </div>
                     </div>
+                    <!-- NOTIFICACION -->
+                    <div role="alert" id="mitoast" aria-live="assertive" aria-atomic="true" class="toast">
+                        <div class="toast-header">
+                            <!-- Nombre de la Aplicación -->
+                            <div class="row tituloToast" id="tituloToast">
+                                <strong class="mr-auto">{{tituloToast}}</strong>
+                            </div>
+                        </div>
+                        <div class="toast-content">
+                            <div class="row textoToast">
+                                <strong >{{textoToast}}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- NOTIFICACION -->
                 </div>
               
             </div>
         </div>
+        
     </div>
 
     <style scoped>
@@ -365,7 +384,21 @@
                     {id: "temperas", descripcion: "TEMPERAS"},
                     {id: "extras", descripcion: "EXTRAS"},
                     {id: "otros", descripcion: "OTROS"}
-                ]
+                ],
+                titulo: null,
+                textoToast: null
+            },
+            mounted () {
+                let envio = JSON.parse(localStorage.getItem("datosEnvio"));
+                console.log(envio);
+                this.envio.nombre = envio.nombre;
+                this.envio.direccion = envio.direccion;
+                this.envio.ciudad = envio.ciudad;
+                this.envio.provincia = envio.provincia;
+                this.envio.codigoPostal = envio.codigoPostal;
+                this.envio.caracteristica = envio.caracteristica;
+                this.envio.telefono = envio.telefono;
+                this.recordarDatos = true;
             },
             methods:{
                 habilitarBtnEnviar () {
@@ -383,7 +416,6 @@
                 },
                 continuar () {
                     this.pedido = true;
-                    return
                     this.resetErrores();
                     if (this.envio.nombre != null && this.envio.nombre.trim() != '' &&
                         this.envio.direccion != null && this.envio.direccion.trim() != '' &&
@@ -395,7 +427,7 @@
                         {
                             this.pedido = true;
                             if (this.recordarDatos) {
-                                localStorage.setItem("datosEnvio", this.envio)
+                                localStorage.setItem("datosEnvio", JSON.stringify(this.envio))
                             } else {
                                 localStorage.removeItem("datosEnvio")
                             }
@@ -430,31 +462,61 @@
                 },
                 confirmar () {
                     this.loading= true;
-                    // let formdata = new FormData();
-                    // formdata.append("usuario", app.usuario);
-                    // formdata.append("password", app.password);
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/conexion/login.php?accion=login", formdata)
-                    //     // axios.post("conexion/login.php?accion=login", formdata)
-                    //     .then(function(response){
-                    //         console.log(response.data);
-                    //         if (response.data.error) {
-                    //             app.mostrarToast("Error", response.data.mensaje);
-                    //         } else {
-                    //             if (app.recordar) {
-                    //                 localStorage.setItem("usuario", app.usuario)
-                    //             } else {
-                    //                 localStorage.removeItem("usuario", app.usuario)
-                    //             }
-                    //             window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
-                    //             // window.location.href = 'home.php'; 
+                    let formdata = new FormData();
+                    const tiempoTranscurrido = Date.now();
+                    const hoy = new Date(tiempoTranscurrido);
+                    let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getYear();
+
+                    formdata.append("nombreSiPueden", this.envio.nombre);
+                    formdata.append("direccionEnvio", this.envio.direccion);
+                    formdata.append("ciudad", this.envio.ciudad);
+                    formdata.append("provincia", this.envio.provincia);
+                    formdata.append("codigoPostal", this.envio.codigoPostal);
+                    formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
+                    formdata.append("fecha", fecha);
+                    formdata.append("mail", "marcos_uran@hotmail.com");
+                    formdata.append("pedido", []);
+                
+                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
+                        // axios.post("conexion/login.php?accion=login", formdata)
+                        .then(function(response){
+                            console.log(response.data);
+                            if (response.data.error) {
+                                app.mostrarToast("Error", response.data.mensaje);
+                            } else {
+                                // app.enviarMail(fecha, response.data.archivoPdf);
                                 
-                    //         }
-                    //         app.loading = false;
-                    //     }).catch( error => {
-                    //         app.loading = false;
-                    //         app.mostrarToast("Error", response.data.mensaje);
-                    //     })
+                                window.open(response.data.archivoPdf);
+                                app.mostrarToast("Éxito", response.data.mensaje);
+                                // window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
+                                // window.location.href = 'home.php'; 
+                                
+                            }
+                            app.loading = false;
+                        }).catch( error => {
+                            console.log(error);
+                            app.loading = false;
+                            app.mostrarToast("Error", "response.data.mensaje");
+                        })
                     
+                },
+                mostrarToast(titulo, texto) {
+                    app.tituloToast = titulo;
+                    app.textoToast = texto;
+                    var toast = document.getElementById("mitoast");
+                    var tituloToast = document.getElementById("tituloToast");
+                    toast.classList.remove("toast");
+                    toast.classList.add("mostrar");
+                    setTimeout(function(){ toast.classList.toggle("mostrar"); }, 10000);
+                    if (titulo == 'Éxito') {
+                        toast.classList.remove("bordeError");
+                        toast.classList.add("bordeExito");
+                        tituloToast.className = "exito";
+                    } else {
+                        toast.classList.remove("bordeExito");
+                        toast.classList.add("bordeError");
+                        tituloToast.className = "errorModal";
+                    }
                 }
 
             }

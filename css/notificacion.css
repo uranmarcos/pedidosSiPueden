@@ -30,6 +30,9 @@ div.row.textoToast >> strong{
     display: flex;
     align-items: center
 }
+#mitoast{
+    z-index:35;
+}
 .exito {
     width: 100%;
     text-align: center;
