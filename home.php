@@ -182,11 +182,24 @@
                             <div class="modal-header  d-flex justify-content-center">
                                 <h5 class="modal-title" id="ModalLabel">CONFIRMACIÓN</h5>
                             </div>
-                            <div class="modal-body d-flex justify-content-center">
-                                ¿Desea enviar el pedido?
+                            <div class="modal-body row d-flex justify-content-center">
+                                <div class="col-12 confirmacion">
+                                    ¿Desea enviar el pedido?
+                                </div>    
+                                <div class="col-12 copia">
+                                    <input type="checkbox" @click="mailCopia = null" v-model="enviarCopia">
+                                    <label>Quiero recibir una copia en mi correo</label>
+                                </div>                              <br>    
+                                <div class="col-12" v-if="enviarCopia">
+                                    <input class="inputCopia" :class="errorMail ? 'inputError' : ''" type="text" v-model="mailCopia">
+                                </div>
                             </div>
+                            
+
+
+
                             <div class="modal-footer d-flex justify-content-between">
-                                <button type="button" class="btn boton" data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn boton" :disabled="loading" data-dismiss="modal">Cancelar</button>
                                 
                                 <button type="button" @click="confirmar()" class="btn boton" v-if="!loading">
                                     Confirmar
@@ -386,7 +399,10 @@
                     {id: "otros", descripcion: "OTROS"}
                 ],
                 titulo: null,
-                textoToast: null
+                textoToast: null,
+                mailCopia: null,
+                enviarCopia: false,
+                errorMail: false
             },
             mounted () {
                 let envio = JSON.parse(localStorage.getItem("datosEnvio"));
@@ -460,7 +476,25 @@
                     this.errorTelefono= null
                     this.errorCodigoPostal= null                
                 },
+                validarMail (mail) {
+                    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+                        return (true)
+                    }
+                    return (false)
+                },
                 confirmar () {
+                    this.errorMail = false;
+                    if (this.enviarCopia) {
+                        if (this.mailCopia == null || this.mailCopia.trim() == '') {
+                            this.errorMail = true;
+                            return;
+                        } else {
+                            if (!this.validarMail(this.mailCopia)) {
+                                this.errorMail = true;
+                                return;
+                            }
+                        }
+                    }
                     this.loading= true;
                     let formdata = new FormData();
                     const tiempoTranscurrido = Date.now();
@@ -475,6 +509,7 @@
                     formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
                     formdata.append("fecha", fecha);
                     formdata.append("mail", "marcos_uran@hotmail.com");
+                    formdata.append("mailCopia", this.mailCopia);
                     formdata.append("pedido", []);
                 
                     axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
@@ -484,9 +519,6 @@
                             if (response.data.error) {
                                 app.mostrarToast("Error", response.data.mensaje);
                             } else {
-                                // app.enviarMail(fecha, response.data.archivoPdf);
-                                
-                                window.open(response.data.archivoPdf);
                                 app.mostrarToast("Éxito", response.data.mensaje);
                                 // window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
                                 // window.location.href = 'home.php'; 

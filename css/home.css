@@ -10,6 +10,47 @@ img {
 }
 
 
+
+/* MODAL CONFIRMACION */
+.confirmacion{
+    width: 100%;
+    text-align: center;
+}
+.copia{
+    margin-top:10px;
+    font-size:12px;
+    color: grey;
+    display: flex;
+    justify-content: center;
+}
+.inputCopia{
+    width:100%;
+    text-align: center;
+    border: grey solid 1px;
+    border-radius: 5px;
+    height: 30px;;
+}
+.inputCopia:focus{
+    outline: none;
+}
+.inputError{
+    border: red solid 1px;
+}
+.modal-header{
+    padding: 0 !important;
+}
+#ModalLabel{
+    background-color:  rgb(124, 69, 153);
+    color: white;
+    padding: 0 !important;
+    display: flex;
+    width: 100%;
+    height: 60px;
+    justify-content: center;
+    align-items: center;
+
+}
+
      /* ESTILOS LOADING */
      .contenedorLoading {
         color: rgb(124, 69, 153);
