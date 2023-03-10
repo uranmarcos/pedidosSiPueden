@@ -168,6 +168,9 @@ h6{
     height: 40px;
     border: solid 1px grey;
 }
+.btnCategoriaSeleccionado:focus{
+    outline: none;
+}
 .textoBtnRemarcado{
     background-color: rgba(12, 12, 12, 0.5);
     padding: 2px;
