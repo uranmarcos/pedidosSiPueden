@@ -1,4 +1,5 @@
 <?php
+    $GLOBALS["login"] = false;
     $accion = "mostrar";
     $res = array("error" => false);
     
@@ -12,22 +13,21 @@
             $usuario    = $_POST["usuario"];
             $password   = $_POST["password"];     
             
-            if ($usuario == "sipueden" && $password == 123456) {
-                $mensaje = "login ok";
-                $res["mensaje"] = $mensaje;
-                $res["error"] = false;
+            if ($usuario == "sipueden@fundacionsi.org.ar" && $password == 30712506829) {
+                $GLOBALS["login"] = true;
+                header("Location: home.php");
             }  else {
-                if ($usuario != 'sipueden' && $password != 123456) {
+                if ($usuario != 'sipueden@fundacionsi.org.ar' && $password != 30712506829) {
                     $error = "Los datos ingresados son incorrectos";
                     $res["mensaje"] = $error;
                     $res["error"] = true;
                     break;
-                }  else if ($usuario != 'sipueden' && $password == 123456) {
+                }  else if ($usuario != 'sipueden@fundacionsi.org.ar' && $password == 30712506829) {
                     $error = "El usuario ingresado es incorrecto";
                     $res["mensaje"] = $error;
                     $res["error"] = true;
                     break;
-                }  else if ($usuario == 'sipueden' && $password != 123456) {
+                }  else if ($usuario == 'sipueden@fundacionsi.org.ar' && $password != 30712506829) {
                     $error = "La contraseña ingresada es incorrecta";
                     $res["mensaje"] = $error;
                     $res["error"] = true;

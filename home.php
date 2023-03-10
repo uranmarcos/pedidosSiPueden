@@ -1,3 +1,11 @@
+<?php
+
+if (!$GLOBALS["login"] ) {
+    header("Location: index.html");
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
