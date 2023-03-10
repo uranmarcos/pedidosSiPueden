@@ -1,6 +1,6 @@
 <?php
-
-if (!$GLOBALS["login"] ) {
+session_start();
+if (!$_SESSION["login"] ) {
     header("Location: index.html");
 }
 
@@ -21,10 +21,7 @@ if (!$GLOBALS["login"] ) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-    <link href="css/home.css" rel="stylesheet">
-    <link href="css/notificacion.css" rel="stylesheet">
-  
- 
+    <link href="css/home.css" rel="stylesheet"> 
 </head>
 <body>
     <div id="app">
@@ -245,21 +242,6 @@ if (!$GLOBALS["login"] ) {
                             </div>
                         </div>
                     </div>
-                    <!-- NOTIFICACION -->
-                    <div role="alert" id="mitoast" aria-live="assertive" aria-atomic="true" class="toast">
-                        <div class="toast-header">
-                            <!-- Nombre de la Aplicación -->
-                            <div class="row tituloToast" id="tituloToast">
-                                <strong class="mr-auto">{{tituloToast}}</strong>
-                            </div>
-                        </div>
-                        <div class="toast-content">
-                            <div class="row textoToast">
-                                <strong >{{textoToast}}</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- NOTIFICACION -->
                 </div>
               
             </div>
@@ -541,51 +523,24 @@ if (!$GLOBALS["login"] ) {
                     formdata.append("pedido", []);
                 
                     axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
-                        // axios.post("conexion/login.php?accion=login", formdata)
-                        .then(function(response){
-                            console.log(response.data);
-                            if (response.data.error) {
-                                app.errorEnvio= true;
-                                app.pedidoEnviado= false;
-                                // app.mostrarToast("Error", response.data.mensaje);
-                            } else {
-                                app.errorEnvio= false;
-                                app.pedidoEnviado= true;
-                                // app.mostrarToast("Éxito", response.data.mensaje);
-                                // window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
-                                
-                            }
-                            app.loading = false;
-                        }).catch( error => {
+                    .then(function(response){    
+                        if (response.data.error) {
                             app.errorEnvio= true;
                             app.pedidoEnviado= false;
-                            app.loading = false;
-                            // app.mostrarToast("Error", "response.data.mensaje");
-                        })
-                    
+                        } else {
+                            app.errorEnvio= false;
+                            app.pedidoEnviado= true;
+                        }
+                        app.loading = false;
+                    }).catch( error => {
+                        app.errorEnvio= true;
+                        app.pedidoEnviado= false;
+                        app.loading = false;
+                    })                
                 },
                 terminar () {
                     window.location.href = 'home.php'; 
-                },
-                mostrarToast(titulo, texto) {
-                    app.tituloToast = titulo;
-                    app.textoToast = texto;
-                    var toast = document.getElementById("mitoast");
-                    var tituloToast = document.getElementById("tituloToast");
-                    toast.classList.remove("toast");
-                    toast.classList.add("mostrar");
-                    setTimeout(function(){ toast.classList.toggle("mostrar"); }, 10000);
-                    if (titulo == 'Éxito') {
-                        toast.classList.remove("bordeError");
-                        toast.classList.add("bordeExito");
-                        tituloToast.className = "exito";
-                    } else {
-                        toast.classList.remove("bordeExito");
-                        toast.classList.add("bordeError");
-                        tituloToast.className = "errorModal";
-                    }
                 }
-
             }
         })
     </script>

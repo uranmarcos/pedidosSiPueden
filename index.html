@@ -237,7 +237,6 @@
                     localStorage.removeItem("usuario");
                     this.usuario = "";
                 }
-                console.log(localStorage);
             },
             methods:{
                 changeRecordar () {
@@ -270,7 +269,6 @@
                         axios.post("http://localhost/proyectos/pedidosSiPueden/conexion/login.php?accion=login", formdata)
                         // axios.post("conexion/login.php?accion=login", formdata)
                         .then(function(response){
-                            console.log(response.data);
                             if (response.data.error) {
                                 app.mostrarToast("Error", response.data.mensaje);
                             } else {
@@ -279,8 +277,8 @@
                                 } else {
                                     localStorage.removeItem("usuario", app.usuario)
                                 }
-                                window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
-                                // window.location.href = 'home.php'; 
+                                // window.location.href = 'http://localhost/proyectos/pedidosSiPueden/home.php'; 
+                                window.location.href = 'home.php'; 
                                 
                             }
                             app.loading = false;
