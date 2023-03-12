@@ -1,16 +1,16 @@
 <?php
 class ApptivaDB {
-    // private $host = "localhost";
-    // private $usuario = "root";
-    // private $clave = "";
-    // private $db = "pedidossipueden";
-    // public $conexion;
-
     private $host = "localhost";
-    private $usuario = "fundaci_pedidos";
-    private $clave = "pedidos.1379";
-    private $db = "fundaci_pedidos";
+    private $usuario = "root";
+    private $clave = "";
+    private $db = "pedidossipueden";
     public $conexion;
+
+    // private $host = "localhost";
+    // private $usuario = "fundaci_pedidos";
+    // private $clave = "pedidos.1379";
+    // private $db = "fundaci_pedidos";
+    // public $conexion;
 
 
     // $dsn = "mysql:dbname=fundaci_pedidos; host=localhost; port=21";

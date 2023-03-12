@@ -43,11 +43,11 @@ if (!$_SESSION["login"] ) {
                         <div class="px-3 mt-3 row">
                             <div class="col-sm-12 col-md-6">
                                 <label for="nombre">Nombre Sí Pueden (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
-                                <input class="form-control" maxlength="60" id="nombre" v-model="envio.nombre">
+                                <input class="form-control" autocomplete="off" maxlength="60" id="nombre" v-model="envio.nombre">
                             </div>
-                            <div class="col-sm-12 col-md-6">
+                            <div class="col-sm-12 col-md-6  mt-3 mt-md-0">
                                 <label for="nombre">Nombre y apellido del voluntario (*) <span class="errorLabel" v-if="errorNombreVoluntario">{{errorNombreVoluntario}}</span></label>
-                                <input class="form-control" maxlength="60" id="nombreVoluntario" v-model="envio.nombreVoluntario">
+                                <input class="form-control" autocomplete="off" maxlength="60" id="nombreVoluntario" v-model="envio.nombreVoluntario">
                             </div>
                             <div class="col-12 subtitleEnvio">
                                 <label>Dirección (del voluntario)</label>
@@ -55,19 +55,19 @@ if (!$_SESSION["login"] ) {
                             
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="direccion">Calle y número (*)<span class="errorLabel" v-if="errorDireccion">{{errorDireccion}}</span></label>
-                                <input class="form-control" maxlength="50" id="direccion" v-model="envio.direccion">
+                                <input class="form-control" autocomplete="off" maxlength="50" id="direccion" v-model="envio.direccion">
                             </div>
                             <div class="col-sm-6 col-md-3 mt-3">
                                 <label for="piso">Piso</label>
-                                <input class="form-control" maxlength="5" id="direccion" v-model="envio.piso">
+                                <input class="form-control" autocomplete="off" maxlength="5" id="direccion" v-model="envio.piso">
                             </div>
                             <div class="col-sm-6 col-md-3 mt-3">
                                 <label for="dpto">Dpto.</label>
-                                <input class="form-control" maxlength="5" id="ciudad" v-model="envio.dpto">
+                                <input class="form-control" autocomplete="off" maxlength="5" id="ciudad" v-model="envio.dpto">
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="ciudad">Ciudad (*) <span class="errorLabel" v-if="errorCiudad">{{errorCiudad}}</span></label>
-                                <input class="form-control" maxlength="30" id="ciudad" v-model="envio.ciudad">
+                                <input class="form-control" autocomplete="off" maxlength="30" id="ciudad" v-model="envio.ciudad">
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="provincia">Provincia (*) <span class="errorLabel" v-if="errorProvincia">{{errorProvincia}}</span></label>
@@ -77,19 +77,19 @@ if (!$_SESSION["login"] ) {
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="ciudad">Código Postal (*) <span class="errorLabel" v-if="errorCodigoPostal">{{errorCodigoPostal}}</span></label>
-                                <input class="form-control" maxlength="8" id="codigoPostal" v-model="envio.codigoPostal">
+                                <input class="form-control" autocomplete="off" maxlength="8" id="codigoPostal" v-model="envio.codigoPostal">
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="provincia">Teléfono (*) <span class="errorLabel" v-if="errorTelefono">{{errorTelefono}}</span></label>
                                 <div class="row">
                                     <div class="col-3">
-                                        <input class="form-control" maxlength="4" id="telefono" v-model="envio.caracteristica">
+                                        <input class="form-control" autocomplete="off" maxlength="4" id="telefono" v-model="envio.caracteristica">
                                     </div> 
                                     <div class="col-1">
                                         -
                                     </div> 
                                     <div class="col-8">
-                                        <input class="col-sm-9 form-control" maxlength="9" id="telefono" v-model="envio.telefono">
+                                        <input class="col-sm-9 form-control" autocomplete="off" maxlength="9" id="telefono" v-model="envio.telefono">
                                     </div>
                                 </div>
                             </div>
@@ -583,10 +583,10 @@ if (!$_SESSION["login"] ) {
                     formdata.append("direccionEnvio", this.envio.direccion);
                     
                     let direccion = this.envio.direccion;
-                    if (this.envio.piso.trim() != '' || this.envio.piso != null ) {
+                    if (this.envio.piso != null && this.envio.piso.trim() != '') {
                         direccion = direccion + ". Piso: " + this.envio.piso;
                     }
-                    if (this.envio.dpto.trim() != '' || this.envio.dpto != null ) {
+                    if (this.envio.dpto != null && this.envio.dpto.trim() != '') {
                         direccion = direccion + ". Dpto: " + this.envio.dpto;
                     }
                     formdata.append("direccionEnvio", direccion);
@@ -596,7 +596,8 @@ if (!$_SESSION["login"] ) {
                     formdata.append("codigoPostal", this.envio.codigoPostal);
                     formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
                     formdata.append("fecha", fecha);
-                    formdata.append("mail", "marcos_uran@hotmail.com");
+                    // formdata.append("mail", "marcos_uran@hotmail.com");
+                    formdata.append("mail", "laurapecorelli@hotmail.com.ar");
                     formdata.append("mailCopia", this.mailCopia);
                     
                     let pedido = '';

@@ -39,13 +39,14 @@
             $date = date("Y-m-d H:i:s");
 
             $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
-            $u = $user -> insertar("pedidos", $data);
-
-            $res["tipo"] = $nombreSiPueden;
+            // local:
+            // $u = $user -> insertar("pedidos", $data);
+            // prod
+            $u = $user -> insertar("sipueden", $data);
          
             if ($u == false) { 
-                //$res["mensaje"] = "El pedido no pudo realizarse";
-                $res["mensaje"] = $u;
+                $res["mensaje"] = "El pedido no pudo realizarse";
+                // $res["mensaje"] = $u;
                 $res["error"] = true;
                
             } else {
@@ -106,8 +107,6 @@
                         $pdf->SetFont('Arial','',10);
                         $pdf->Multicell(190,10,utf8_decode($otrosFormateado),1);
                     }
-                   
-                    return;
 
                     $archivoPdf = $pdf->Output('','S');                  
     
