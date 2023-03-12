@@ -55,7 +55,9 @@ if (!$_SESSION["login"] ) {
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="provincia">Provincia (*) <span class="errorLabel" v-if="errorProvincia">{{errorProvincia}}</span></label>
-                                <input class="form-control" maxlength="30" id="provincia" v-model="envio.provincia">
+                                <select class="form-control" name="provincia" id="provincia" v-model="envio.provincia">
+                                    <option v-for="provincia in provincias" v-bind:value="provincia" >{{provincia}}</option>
+                                </select>
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="ciudad">Código Postal (*) <span class="errorLabel" v-if="errorCodigoPostal">{{errorCodigoPostal}}</span></label>
@@ -422,6 +424,32 @@ if (!$_SESSION["login"] ) {
                 errorMail: false,
                 errorEnvio: false,
                 pedidoEnviado: false,
+                provincias: [
+                    "Buenos Aires",
+                    "CABA",
+                    "Catamarca",
+                    "Chaco",
+                    "Chubut",
+                    "Córdoba",
+                    "Corrientes",
+                    "Entre Ríos",
+                    "Formosa",
+                    "Jujuy",
+                    "La Pampa",
+                    "La Rioja",
+                    "Mendoza",
+                    "Misiones",
+                    "Neuquén",
+                    "Río Negro",
+                    "Salta",
+                    "San Juan",
+                    "San Luis",
+                    "Santa Cruz",
+                    "Santa Fe",
+                    "Santiago del Estero",
+                    "Tierra del Fuego",
+                    "Tucumán"
+                ]
             },
             mounted () {
                 let envio = JSON.parse(localStorage.getItem("datosEnvio"));
