@@ -3,7 +3,7 @@ class ApptivaDB {
     private $host = "localhost";
     private $usuario = "root";
     private $clave = "";
-    private $db = "pedidossiPueden";
+    private $db = "pedidossipueden";
     public $conexion;
     
     public function __construct(){
@@ -17,6 +17,7 @@ class ApptivaDB {
             $resultado = $this->conexion->query("INSERT INTO $tabla VALUES(null, $datos)") or die();
             return true;
         } catch (\Throwable $th) {
+            // return $th;
             return false;
         }
     }

@@ -43,7 +43,7 @@ if (!$_SESSION["login"] ) {
                         <div class="px-3 mt-3 row">
                             <div class="col-sm-12 col-md-6">
                                 <label for="nombre">Nombre Sí Pueden (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
-                                <input class="form-control" maxlength="30" id="nombre" v-model="envio.nombre">
+                                <input class="form-control" maxlength="60" id="nombre" v-model="envio.nombre">
                             </div>
                             <div class="col-sm-12 col-md-6">
                                 <label for="nombre">Nombre y apellido del voluntario (*) <span class="errorLabel" v-if="errorNombreVoluntario">{{errorNombreVoluntario}}</span></label>
@@ -241,8 +241,8 @@ if (!$_SESSION["login"] ) {
                             </div>
                             
 
-                            <div class="modal-footer d-flex justify-content-between" v-if="!errorEnvio && !pedidoEnviado">
-                                <button type="button" class="btn boton" :disabled="loading" data-dismiss="modal">Cancelar</button>
+                            <div class="modal-footer d-flex justify-content-between" v-if="!pedidoEnviado">
+                                <button type="button" class="btn boton" @click="errorEnvio =false" :disabled="loading" data-dismiss="modal">Cancelar</button>
                                 
                                 <button type="button" @click="confirmar()" class="btn boton" v-if="!loading">
                                     Confirmar
@@ -597,7 +597,6 @@ if (!$_SESSION["login"] ) {
                     formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
                     formdata.append("fecha", fecha);
                     formdata.append("mail", "marcos_uran@hotmail.com");
-                    formdata.append("voluntario", "nombreVoluntario");
                     formdata.append("mailCopia", this.mailCopia);
                     
                     let pedido = '';
@@ -621,10 +620,11 @@ if (!$_SESSION["login"] ) {
                     formdata.append("pedido", pedido);
                     formdata.append("otros", otros);
                    
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
+                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
                     // axios.post("conexion/login.php?accion=login", formdata)
-                    axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
+                    // axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
                     .then(function(response){    
+                        console.log(response.data.tipo);
                         if (response.data.error) {
                             app.errorEnvio= true;
                             app.pedidoEnviado= false;

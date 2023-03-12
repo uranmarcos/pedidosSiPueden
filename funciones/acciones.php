@@ -38,13 +38,16 @@
             date_default_timezone_set('America/Argentina/Cordoba');
             $date = date("Y-m-d H:i:s");
 
-            $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "'";
+            $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
             $u = $user -> insertar("pedidos", $data);
 
-            if (!$u) { 
-                $res["mensaje"] = "El pedido no pudo realizarse";
+            $res["tipo"] = $nombreSiPueden;
+         
+            if ($u == false) { 
+                //$res["mensaje"] = "El pedido no pudo realizarse";
+                $res["mensaje"] = $u;
                 $res["error"] = true;
-                return;
+               
             } else {
                 $otrosFormateado = ""; 
                 if ($otros != null) {
@@ -104,7 +107,8 @@
                         $pdf->Multicell(190,10,utf8_decode($otrosFormateado),1);
                     }
                    
-                    
+                    return;
+
                     $archivoPdf = $pdf->Output('','S');                  
     
                     $email_user = "pedidosresidencias@hotmail.com";
