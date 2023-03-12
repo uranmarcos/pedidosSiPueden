@@ -79,7 +79,7 @@ if (!$_SESSION["login"] ) {
                         <div class="px-3 mt-3 row rowBotonesEnvio">
                             <div class="col-6 p-0">
                                 <input type="checkbox" v-model="recordarDatos">
-                                <label>Recordar</label>
+                                <label @click="recordarDatos = !recordarDatos" class="pointer">Recordar</label>
                             </div>
                             <div class="col-6 pr-0 d-flex justify-content-end">
                                 <button type="button" @click="continuar()" class="btn boton">
@@ -425,14 +425,16 @@ if (!$_SESSION["login"] ) {
             },
             mounted () {
                 let envio = JSON.parse(localStorage.getItem("datosEnvio"));
-                this.envio.nombre = envio.nombre;
-                this.envio.direccion = envio.direccion;
-                this.envio.ciudad = envio.ciudad;
-                this.envio.provincia = envio.provincia;
-                this.envio.codigoPostal = envio.codigoPostal;
-                this.envio.caracteristica = envio.caracteristica;
-                this.envio.telefono = envio.telefono;
-                this.recordarDatos = true;
+                if (envio) {
+                    this.envio.nombre = envio.nombre;
+                    this.envio.direccion = envio.direccion;
+                    this.envio.ciudad = envio.ciudad;
+                    this.envio.provincia = envio.provincia;
+                    this.envio.codigoPostal = envio.codigoPostal;
+                    this.envio.caracteristica = envio.caracteristica;
+                    this.envio.telefono = envio.telefono;
+                    this.recordarDatos = true;
+                }
             },
             methods:{
                 habilitarBtnEnviar () {
