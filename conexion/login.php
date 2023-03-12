@@ -1,6 +1,6 @@
 <?php
 session_start();
-$_SESSION["login"] = false;
+    $_SESSION["login"] = false;
     $accion = "mostrar";
     $res = array("error" => false);
     
@@ -17,8 +17,18 @@ $_SESSION["login"] = false;
             if ($usuario == "sipueden@fundacionsi.org.ar" && $password == 30712506829) {
                 $_SESSION["login"] = true;
                 $mensaje = "Login ok";
+                $token = sha1("usuario", false);
                 $res["mensaje"] = $mensaje;
                 $res["error"] = false;
+                $res["token"] = $token;
+            }  else if ($usuario == "marcos@fundacionsi.org.ar" && $password == 30971843) {
+                    $_SESSION["login"] = true;
+                    $_SESSION["admin"] = true;
+                    $mensaje = "Login ok";
+                    $token = sha1("admin", false);
+                    $res["mensaje"] = $mensaje;
+                    $res["error"] = false;
+                    $res["token"] = $token;
             }  else {
                 if ($usuario != 'sipueden@fundacionsi.org.ar' && $password != 30712506829) {
                     $error = "Los datos ingresados son incorrectos";
