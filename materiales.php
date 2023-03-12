@@ -175,7 +175,8 @@ if (!$_SESSION["login"] ) {
                                                     </div>
                                                 </div>
                                                 <div class="row rowArticulo" v-else>
-                                                    <textarea class="otros" v-model="articulo.cantidad"></textarea>
+                                                    <label for="otros"><span class="errorLabel" v-if="articulo.cantidad != null && articulo.cantidad.length == 200">Máximo 200 caracteres</span></label>
+                                                    <textarea class="otros" maxlength="200" v-model="articulo.cantidad"></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -471,7 +472,6 @@ if (!$_SESSION["login"] ) {
             },
             mounted () {
                 let envio = JSON.parse(localStorage.getItem("datosEnvio"));
-                console.log(envio);
                 if (envio) {
                     this.envio.nombre = envio.nombre;
                     this.envio.nombreVoluntario = envio.nombreVoluntario;
@@ -601,7 +601,7 @@ if (!$_SESSION["login"] ) {
                     formdata.append("mailCopia", this.mailCopia);
                     
                     let pedido = '';
-                    let otros = null;
+                    let otros = "";
                     
                     this.listadoPedido.forEach(element => {
                         if (element.cantidad != null && element.cantidad != false && element.cantidad != 0 && element.categoria != 'otros') {
@@ -621,7 +621,9 @@ if (!$_SESSION["login"] ) {
                     formdata.append("pedido", pedido);
                     formdata.append("otros", otros);
                    
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
+                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
+                    // axios.post("conexion/login.php?accion=login", formdata)
+                    axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
                     .then(function(response){    
                         if (response.data.error) {
                             app.errorEnvio= true;
