@@ -20,24 +20,25 @@
         case 'enviarPedido':
             require("pdf.php");
           
-            $nombreSiPueden = $_POST["nombreSiPueden"]; 
-            $direccionEnvio = $_POST["direccionEnvio"]; 
-            $ciudad         = $_POST["ciudad"];  
-            $provincia      = $_POST["provincia"]; 
-            $codigoPostal   = $_POST["codigoPostal"];
-            $telefono       = $_POST["telefono"];
-            $fecha          = $_POST["fecha"];
-            $mail           = $_POST["mail"];
-            $mailCopia      = $_POST["mailCopia"];
-            $pedido    = $_POST["pedido"];
-            $pedidoTabla    = explode(';', $pedido);
-            $otros          = $_POST["otros"];
+            $nombreSiPueden     = $_POST["nombreSiPueden"]; 
+            $nombreVoluntario   = $_POST["nombreVoluntario"]; 
+            $direccionEnvio     = $_POST["direccionEnvio"]; 
+            $ciudad             = $_POST["ciudad"];  
+            $provincia          = $_POST["provincia"]; 
+            $codigoPostal       = $_POST["codigoPostal"];
+            $telefono           = $_POST["telefono"];
+            $fecha              = $_POST["fecha"];
+            $mail               = $_POST["mail"];
+            $mailCopia          = $_POST["mailCopia"];
+            $pedido             = $_POST["pedido"];
+            $pedidoTabla        = explode(';', $pedido);
+            $otros              = $_POST["otros"];
 
             $pedidoBase = $pedido . ", otros : " . $otros;
             date_default_timezone_set('America/Argentina/Cordoba');
             $date = date("Y-m-d H:i:s");
 
-            $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . 0 . "'";
+            $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "'";
             $u = $user -> insertar("pedidos", $data);
 
             if (!$u) { 
@@ -66,24 +67,37 @@
                     $header = array('Listado de articulos pedidos');
                     $pdf->AddPage();
                     $pdf->SetFont('Arial','B',10);
+                    $pdf->Cell(0,10,$fecha,0,1,'R');
+                    $pdf->SetFont('Arial','B',12);
                     $pdf->Cell(0,5,"Nuevo pedido de " . utf8_decode($nombreSiPueden),0,1,'C');
-                    $pdf->Cell(0,10,'Fecha: ' . $fecha,0,1);
-                    $pdf->Cell(0,10, utf8_decode('Dirección: ') . utf8_decode($direccionEnvio),0,1);
-                    $pdf->Cell(0,10,'Ciudad: ' . utf8_decode($ciudad),0,1);
-                    $pdf->Cell(0,10,'Provincia: ' . utf8_decode($provincia),0,1);
+                    
+                    $pdf->Ln();
+                    $pdf->SetFont('Arial','B',11);
+                    $pdf->SetTextColor(255,255,255);
+                    $pdf->Cell(0,10,'Datos de envio: ',0,1, 'L', true);
+                    // $pdf->Cell(0,10,'Datos de envio: ',0,1);
+                    $pdf->SetTextColor(0,0,0);
+                    $pdf->SetFont('Arial','',10);
+                    $pdf->Cell(0,10, utf8_decode("Voluntario: ") . utf8_decode($nombreVoluntario), 0,1);
+                    $pdf->Cell(0,10, utf8_decode("Dirección: ") . utf8_decode($direccionEnvio) . ", " . utf8_decode($ciudad) . ", " . utf8_decode($provincia), 0,1);
+                   
                     $pdf->Cell(0,10, utf8_decode('Código postal: ') . utf8_decode($codigoPostal),0,1);
                     $pdf->Cell(0,10, utf8_decode('Teléfono: ') . utf8_decode($telefono),0,1);
-                    $pdf->SetFont('Arial','B',10);
-                    $pdf->Cell(0,10,'Articulos pedidos: ' ,0,1);
+                    $pdf->Ln();
+                    $pdf->SetFont('Arial','B',11);
+                    $pdf->SetTextColor(255,255,255);
+                    $pdf->Cell(0,10,'Articulos pedidos: ',0,1, 'L', true);
+                    $pdf->SetTextColor(0,0,0);
                     $pdf->SetFont('Arial','',10);
                     $pdf->TablaSimple($header, $pedidoTabla);
     
                     foreach ($pedidoTabla as $key => $value) {
-                        $pdf->SetFont('Arial','',8);
-                        $pdf->Cell(0,10, utf8_decode($value) ,0,1);
+                        $pdf->SetFont('Arial','',10);
+                        $pdf->Cell(0,10, utf8_decode($value),1,1);
                     }
-    
-                    $pdf->SetFont('Arial','B',10);
+                    
+                    $pdf->Ln();
+                    $pdf->SetFont('Arial','B',11);
                     if($otrosFormateado != '' && $otrosFormateado != null) {
                         $pdf->Cell(0,10,'Otros: ',0,1);
                         $pdf->SetFont('Arial','',10);

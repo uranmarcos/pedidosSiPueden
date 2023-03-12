@@ -255,6 +255,11 @@ section{
     justify-content: space-between;
     align-items: center;
 }
+.subtitleEnvio{
+    margin-top: 20px;
+    text-transform: uppercase;
+    color: grey;
+}
 
 /* ESTILO ARTICULOS */
 .textoExplicacion{
@@ -313,6 +318,7 @@ textarea:focus{
 }
 .checkboxNoMedible{
    display: flex;
+
    justify-content: center;
    align-items: center;
 }

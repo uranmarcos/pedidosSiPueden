@@ -32,12 +32,17 @@ if (!$_SESSION["login"] || !$_SESSION["admin"]) {
         
         <div class="container containerMenu">
             <div class="row mt-6">
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                <div class="col-md-6 col-sm-12 my-2 my-md-3 d-flex justify-content-center">
+                    <div class="opciones" @click="irA('pedidos')">
+                        Ver pedidos
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 my-2 my-md-3 d-flex justify-content-center">
                 <div class="opciones" @click="irA('materiales')">
                     Pedido de <br>materiales
                 </div>
               </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+              <div class="col-md-6 col-sm-12 my-2 my-md-3 d-flex justify-content-center">
                 <div class="opciones disabled" @click="irA('usuarios')">
                     
                     Biblioteca
@@ -45,14 +50,14 @@ if (!$_SESSION["login"] || !$_SESSION["admin"]) {
                     <span class="avisoDisabled">(En construcción)</span> 
                 </div>
               </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('articulos')">
+              <div class="col-md-6 col-sm-12 my-2 my-md-3 d-flex justify-content-center"  @click="irA('articulos')">
                 <div class="opciones disabled">
                     Banco de planificaciones
                     <br>
                     <span class="avisoDisabled">(En construcción)</span>
                 </div>
               </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('sedes')">
+              <div class="col-md-6 col-sm-12 my-2 my-md-3 d-flex justify-content-center"  @click="irA('sedes')">
                 <div class="opciones disabled">
                     Otros recursos
                     <br>
@@ -116,6 +121,10 @@ if (!$_SESSION["login"] || !$_SESSION["admin"]) {
             methods:{
                 irA(param) {
                     switch (param) {
+                        case "pedidos":
+                            window.location.href = 'pedidos.php';        
+                            break;
+
                         case "materiales":
                             window.location.href = 'materiales.php';        
                             break;

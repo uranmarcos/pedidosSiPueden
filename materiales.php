@@ -45,9 +45,25 @@ if (!$_SESSION["login"] ) {
                                 <label for="nombre">Nombre Sí Pueden (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
                                 <input class="form-control" maxlength="30" id="nombre" v-model="envio.nombre">
                             </div>
-                            <div class="col-sm-12 col-md-6 mt-3 mt-md-0">
-                                <label for="direccion">Dirección de envio (*)<span class="errorLabel" v-if="errorDireccion">{{errorDireccion}}</span></label>
+                            <div class="col-sm-12 col-md-6">
+                                <label for="nombre">Nombre y apellido del voluntario (*) <span class="errorLabel" v-if="errorNombreVoluntario">{{errorNombreVoluntario}}</span></label>
+                                <input class="form-control" maxlength="60" id="nombreVoluntario" v-model="envio.nombreVoluntario">
+                            </div>
+                            <div class="col-12 subtitleEnvio">
+                                <label>Dirección (del voluntario)</label>
+                            </div>
+                            
+                            <div class="col-sm-12 col-md-6 mt-3">
+                                <label for="direccion">Calle y número (*)<span class="errorLabel" v-if="errorDireccion">{{errorDireccion}}</span></label>
                                 <input class="form-control" maxlength="50" id="direccion" v-model="envio.direccion">
+                            </div>
+                            <div class="col-sm-6 col-md-3 mt-3">
+                                <label for="piso">Piso</label>
+                                <input class="form-control" maxlength="5" id="direccion" v-model="envio.piso">
+                            </div>
+                            <div class="col-sm-6 col-md-3 mt-3">
+                                <label for="dpto">Dpto.</label>
+                                <input class="form-control" maxlength="5" id="ciudad" v-model="envio.dpto">
                             </div>
                             <div class="col-sm-12 col-md-6 mt-3">
                                 <label for="ciudad">Ciudad (*) <span class="errorLabel" v-if="errorCiudad">{{errorCiudad}}</span></label>
@@ -295,6 +311,7 @@ if (!$_SESSION["login"] ) {
                 pedido: false,
                 envio: {
                     nombre: null,
+                    nombreVoluntario: null,
                     direccion: null,
                     ciudad: null,
                     provincia: null,
@@ -308,6 +325,7 @@ if (!$_SESSION["login"] ) {
                 errorProvincia: null,
                 errorTelefono: null,
                 errorCodigoPostal: null,
+                errorNombreVoluntario: null,
                 listadoPedido: [
                     {medible: true, categoria: "afiches", nombre: "Afiche amarillo", descripcion: "Amarillo", cantidad: null},
                     {medible: true, categoria: "afiches", nombre: "Afiche azul", descripcion: "Azul", cantidad: null},
@@ -453,9 +471,13 @@ if (!$_SESSION["login"] ) {
             },
             mounted () {
                 let envio = JSON.parse(localStorage.getItem("datosEnvio"));
+                console.log(envio);
                 if (envio) {
                     this.envio.nombre = envio.nombre;
+                    this.envio.nombreVoluntario = envio.nombreVoluntario;
                     this.envio.direccion = envio.direccion;
+                    this.envio.piso = envio.piso;
+                    this.envio.dpto = envio.dpto;
                     this.envio.ciudad = envio.ciudad;
                     this.envio.provincia = envio.provincia;
                     this.envio.codigoPostal = envio.codigoPostal;
@@ -482,9 +504,10 @@ if (!$_SESSION["login"] ) {
                     window.location.href = 'home.php';    
                 },
                 continuar () {
-                    this.pedido = true;
+                    this.pedido = false;
                     this.resetErrores();
                     if (this.envio.nombre != null && this.envio.nombre.trim() != '' &&
+                        this.envio.nombreVoluntario != null && this.envio.nombreVoluntario.trim() != '' &&
                         this.envio.direccion != null && this.envio.direccion.trim() != '' &&
                         this.envio.ciudad != null && this.envio.ciudad.trim() != '' &&
                         this.envio.provincia != null && this.envio.provincia.trim() != '' &&
@@ -501,6 +524,9 @@ if (!$_SESSION["login"] ) {
                         } else {
                             if (this.envio.nombre == null || this.envio.nombre.trim() == '') {
                                 this.errorNombre = "Campo requerido";
+                            }
+                            if (this.envio.nombreVoluntario == null || this.envio.nombreVoluntario.trim() == '') {
+                                this.errorNombreVoluntario = "Campo requerido";
                             }
                             if (this.envio.direccion == null || this.envio.direccion.trim() == '') {
                                 this.errorDireccion = "Campo requerido";
@@ -553,13 +579,25 @@ if (!$_SESSION["login"] ) {
                     let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getYear();
 
                     formdata.append("nombreSiPueden", this.envio.nombre);
+                    formdata.append("nombreVoluntario", this.envio.nombreVoluntario);
                     formdata.append("direccionEnvio", this.envio.direccion);
+                    
+                    let direccion = this.envio.direccion;
+                    if (this.envio.piso.trim() != '' || this.envio.piso != null ) {
+                        direccion = direccion + ". Piso: " + this.envio.piso;
+                    }
+                    if (this.envio.dpto.trim() != '' || this.envio.dpto != null ) {
+                        direccion = direccion + ". Dpto: " + this.envio.dpto;
+                    }
+                    formdata.append("direccionEnvio", direccion);
+
                     formdata.append("ciudad", this.envio.ciudad);
                     formdata.append("provincia", this.envio.provincia);
                     formdata.append("codigoPostal", this.envio.codigoPostal);
                     formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
                     formdata.append("fecha", fecha);
                     formdata.append("mail", "marcos_uran@hotmail.com");
+                    formdata.append("voluntario", "nombreVoluntario");
                     formdata.append("mailCopia", this.mailCopia);
                     
                     let pedido = '';
@@ -568,7 +606,6 @@ if (!$_SESSION["login"] ) {
                     this.listadoPedido.forEach(element => {
                         if (element.cantidad != null && element.cantidad != false && element.cantidad != 0 && element.categoria != 'otros') {
                             let elemento = null;
-                            console.log(element);
                             if (element.medible) {
                                 elemento = element.nombre + ": " + element.cantidad + "; "; 
                             } else {
