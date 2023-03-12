@@ -1,7 +1,7 @@
 <div class="container">
     <div class="header">
         <div>
-            <img src="img/logo.png" alt="logo">
+            <img src="img/logo.png" class="imgHeader" @click="irA" alt="logo">
         </div>
 
         <button class="btnLogOut" @click="cerrarSesion()" type="button">
@@ -15,6 +15,9 @@
 <script>
     function cerrarSesion() {
         window.location.href = 'funciones/cerrarSesion.php';   
+    }
+    function irA () {
+        window.location.href = 'home.php';        
     }
 
 </script>

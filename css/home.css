@@ -6,6 +6,9 @@
     justify-content: space-between;
     align-items: center;
 }
+.imgHeader:hover{
+    cursor: pointer;
+}
 .btnLogOut{
     background-color:rgb(124, 69, 153);
     border: none;
@@ -16,6 +19,25 @@
 img {
     height: 14vh;
 }
+
+
+/* BREADCRUMB */
+.grey{
+    color: grey
+}
+.breadcrumb{
+    color: rgb(124, 69, 153);
+    font-size:1em;
+    padding:0 !important; 
+    margin-top: 20px;
+    text-transform: uppercase;
+    border-bottom: solid 1px rgb(124, 69, 153);
+}
+.pointer{
+    cursor: pointer;
+}
+
+/* END BREADCRUMB */
 
 
 

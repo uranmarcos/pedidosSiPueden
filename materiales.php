@@ -28,6 +28,14 @@ if (!$_SESSION["login"] ) {
         <?php require("shared/header.html")?>
         
         <div class="container">
+            <!-- START BREADCRUMB -->
+            <div class="col-12 p-0">
+                    <div class="breadcrumb">
+                        <span class="pointer mr-2" @click="irAHome()">Inicio</span>  -  <span class="ml-2 grey"> Pedido de materiales </span>
+                    </div>
+                </div>
+                <!-- END BREADCRUMB -->
+
             <div class="row mt-6">
                 <div class="col-12">
                     <div class="card" v-if="!pedido">
@@ -440,6 +448,9 @@ if (!$_SESSION["login"] ) {
                         this.listadoPedido.filter(element => element.nombre == nombre)[0].cantidad = cantidadModificada;
                     }
                 },
+                irAHome () {
+                    window.location.href = 'home.php';    
+                },
                 continuar () {
                     this.pedido = true;
                     this.resetErrores();
@@ -520,8 +531,29 @@ if (!$_SESSION["login"] ) {
                     formdata.append("fecha", fecha);
                     formdata.append("mail", "marcos_uran@hotmail.com");
                     formdata.append("mailCopia", this.mailCopia);
-                    formdata.append("pedido", []);
-                
+                    
+                    let pedido = '';
+                    let otros = null;
+                    
+                    this.listadoPedido.forEach(element => {
+                        if (element.cantidad != null && element.cantidad != false && element.cantidad != 0 && element.categoria != 'otros') {
+                            let elemento = null;
+                            console.log(element);
+                            if (element.medible) {
+                                elemento = element.nombre + ": " + element.cantidad + "; "; 
+                            } else {
+                                elemento = element.nombre + "; ";
+                            }
+                              
+                            pedido = pedido + elemento;
+                        }
+                        if (element.cantidad != null && element.categoria == 'otros') {
+                            otros = element.cantidad;
+                        }
+                    });
+                    formdata.append("pedido", pedido);
+                    formdata.append("otros", otros);
+                   
                     axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
                     .then(function(response){    
                         if (response.data.error) {

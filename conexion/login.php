@@ -24,6 +24,8 @@ $_SESSION["login"] = false;
                     $error = "Los datos ingresados son incorrectos";
                     $res["mensaje"] = $error;
                     $res["error"] = true;
+                    $res["usuario"] = $usuario;
+                    $res["pas"] = $password;
                     break;
                 }  else if ($usuario != 'sipueden@fundacionsi.org.ar' && $password == 30712506829) {
                     $error = "El usuario ingresado es incorrecto";

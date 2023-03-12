@@ -26,7 +26,25 @@
             $fecha          = $_POST["fecha"];
             $mail           = $_POST["mail"];
             $mailCopia      = $_POST["mailCopia"];
-            $pedidoTabla    = [];
+            $pedidoTabla    = $_POST["pedido"];
+            $pedidoTabla    = explode(';', $pedidoTabla);
+            $otros          = $_POST["otros"];
+
+            $otrosFormateado = ""; 
+            if ($otros != null) {
+                $cantidadRenglones = ceil(strlen($otros) / 95);
+                for ($i = 0; $i < $cantidadRenglones; $i++) {
+                    $inicial = 95 * $i;
+                    $final = 95;
+                    if($final > strlen($otros)){
+                        $final = strlen($otros);
+                    }
+                    $string = substr($otros, $inicial, $final) . "\n";  
+                    $otrosFormateado = $otrosFormateado . $string;
+                }
+            }
+
+
             try {
                 $pdf = new PDF();
                 $pdf->AliasNbPages();
@@ -44,7 +62,20 @@
                 $pdf->Cell(0,10,'Articulos pedidos: ' ,0,1);
                 $pdf->SetFont('Arial','',10);
                 $pdf->TablaSimple($header, $pedidoTabla);
-              
+
+                foreach ($pedidoTabla as $key => $value) {
+                    $pdf->SetFont('Arial','',8);
+                    $pdf->Cell(0,10, utf8_decode($value) ,0,1);
+                }
+
+                $pdf->SetFont('Arial','B',10);
+                if($otrosFormateado != '' && $otrosFormateado != null) {
+                    $pdf->Cell(0,10,'Otros: ',0,1);
+                    $pdf->SetFont('Arial','',10);
+                    $pdf->Multicell(190,10,utf8_decode($otrosFormateado),1);
+                }
+               
+                
                 $archivoPdf = $pdf->Output('','S');                  
 
                 $email_user = "pedidosresidencias@hotmail.com";
@@ -72,8 +103,8 @@
                 }
                 $phpmailer->Subject = $the_subject;	
 
-                $phpmailer->Body .="<p>Nuevo pedido de </p>" . $nombreSiPueden;
-                $phpmailer->Body .= $ciudad . " " . $provincia;
+                $phpmailer->Body .="<p>Nuevo pedido de </p>" . $nombreSiPueden . " - ";
+                $phpmailer->Body .= $ciudad . ", " . $provincia;
                 $phpmailer->Body .= "<p>Fecha: " . $fecha ."</p>";
                 $phpmailer->IsHTML(true);
                 $phpmailer->AddStringAttachment($archivoPdf, $nombreSiPueden . '.pdf','base64');
