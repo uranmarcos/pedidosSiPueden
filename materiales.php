@@ -620,9 +620,9 @@ if (!$_SESSION["login"] ) {
                     formdata.append("pedido", pedido);
                     formdata.append("otros", otros);
                    
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
+                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
                     // axios.post("conexion/login.php?accion=login", formdata)
-                    // axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
+                    axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
                     .then(function(response){    
                         console.log(response.data.tipo);
                         if (response.data.error) {
