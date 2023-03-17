@@ -172,6 +172,55 @@
 
         break;
 
+        case 'consultarLibros':
+            //  $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
+            // local:
+            // $u = $user -> insertar("pedidos", $data);
+            // prod
+            $u = $user -> consultarLibros();
+
+            if ($u || $u == []) { 
+                $res["libros"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo recuperar los pedidos";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'crearCategorias':
+            $categorias = $_POST["categorias"];
+            $categorias = explode(',', $categorias);
+           
+            //  $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
+            // local:
+            // $u = $user -> insertar("pedidos", $data);
+            // prod
+            $data = "";
+            $length = count($categorias);
+            for ($i = 0; $i < $length; $i++) {
+                if ($i + 1 < $length) {
+                    $data = $data . "(null , '" . $categorias[$i] . "' ), ";
+                } else {
+                    $data = $data . "(null , '" . $categorias[$i] . "' )";
+                }
+            }
+            $data = "INSERT INTO categoriaslibros VALUES $data ;";
+
+            $u = $user -> crearCategorias($data);
+
+            if ($u) {
+                $res["error"] = false;
+                $res["mensaje"] = "La creación se se realizó correctamente";
+            } else {
+                $res["mensaje"] = "No se pudo crear la/s categoria/s";
+                $res["error"] = true;
+            } 
+
+        break;
+
         default:
             # code...
             break;
