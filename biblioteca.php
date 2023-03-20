@@ -624,7 +624,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     let formdata = new FormData();
                     formdata.append("idLibro", app.libroEliminable.id);
 
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=eliminarLibro", formdata)
+                    axios.post("funciones/acciones.php?accion=eliminarLibro", formdata)
                     .then(function(response){    
                         app.eliminandoLibro = false;
                         if (response.data.error) {
@@ -674,7 +674,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 },
                 consultarCategorias () {
                     this.buscandoCategorias = true;
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=consultarCategorias")
+                    axios.post("funciones/acciones.php?accion=consultarCategorias")
+                    //axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=consultarCategorias")
                     .then(function(response){
                         app.buscandoCategorias = false;
                         if (response.data.error) {
@@ -689,7 +690,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     let formdata = new FormData();
                     formdata.append("idCategoria", app.categoriaBusqueda);
 
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=buscarPorCategoria", formdata)
+                    axios.post("funciones/acciones.php?accion=buscarPorCategoria", formdata)
+                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=buscarPorCategoria", formdata)
                     .then(function(response){    
                         app.buscandoLibros = false;
                         if (response.data.error) {
@@ -709,7 +711,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 },
                 consultarLibros() {
                     this.buscandoLibros = true;
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=consultarLibros")
+                    axios.post("funciones/acciones.php?accion=consultarLibros")
+                    //axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=consultarLibros")
                     .then(function(response){    
                         app.buscandoLibros = false;
                         if (response.data.error) {
@@ -770,7 +773,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     let formdata = new FormData();
                     formdata.append("categoria", app.nuevaCategoria);
           
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearCategoria", formdata)
+                    axios.post("funciones/acciones.php?accion=crearCategoria", formdata)
+                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearCategoria", formdata)
                     .then(function(response){
                         console.log(response.data);
                         if (response.data.error) {
@@ -854,7 +858,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     formdata.append("imagen", app.libro.imagen);
                     formdata.append("nombre", app.libro.nombre);
                     formdata.append("descripcion", app.libro.descripcion);
-                    axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearLibro", formdata)
+                    axios.post("funciones/acciones.php?accion=crearLibro", formdata)
+                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearLibro", formdata)
                     .then(function(response){
                         console.log(response.data);
                         if (response.data.error) {

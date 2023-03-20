@@ -270,7 +270,6 @@
                         let formdata = new FormData();
                         formdata.append("usuario", app.usuario);
                         formdata.append("password", app.password);
-                        //axios.post("http://localhost/proyectos/pedidosSiPueden/conexion/login.php?accion=login", formdata)
                         axios.post("conexion/login.php?accion=login", formdata)
                         .then(function(response){
                             if (response.data.error) {
