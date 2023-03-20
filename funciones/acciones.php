@@ -173,12 +173,7 @@
         break;
 
         case 'consultarLibros':
-            //  $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
-            // local:
-            // $u = $user -> insertar("pedidos", $data);
-            // prod
             $u = $user -> consultarLibros();
-
             if ($u || $u == []) { 
                 $res["libros"] = $u;
                 $res["mensaje"] = "La consulta se realizó correctamente";
@@ -190,32 +185,80 @@
 
         break;
 
-        case 'crearCategorias':
-            $categorias = $_POST["categorias"];
-            $categorias = explode(',', $categorias);
-           
-            //  $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedidoBase . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
-            // local:
-            // $u = $user -> insertar("pedidos", $data);
-            // prod
-            $data = "";
-            $length = count($categorias);
-            for ($i = 0; $i < $length; $i++) {
-                if ($i + 1 < $length) {
-                    $data = $data . "(null , '" . $categorias[$i] . "' ), ";
-                } else {
-                    $data = $data . "(null , '" . $categorias[$i] . "' )";
-                }
-            }
-            $data = "INSERT INTO categoriaslibros VALUES $data ;";
+        case 'buscarPorCategoria':
+            $idCategoria = $_POST["idCategoria"];
 
-            $u = $user -> crearCategorias($data);
+            $u = $user -> buscarPorCategoria($idCategoria);
+            if ($u || $u == []) { 
+                $res["libros"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo recuperar los pedidos";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'eliminarLibro':
+            $idLibro = $_POST["idLibro"];
+
+            $u = $user -> eliminar("libros", "id = ". $idLibro);
+            if ($u || $u == []) { 
+                $res["libros"] = $u;
+                $res["mensaje"] = "El libro se eliminó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo eliminar el libro";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'consultarCategorias':
+            $u = $user -> consultarCategorias();
+
+            if ($u || $u == []) { 
+                $res["categorias"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo recuperar las categorias";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'crearCategoria':
+            $categoria = $_POST["categoria"];
+            $data = "'" . $categoria  . "'";
+            $u = $user -> insertar("categoriaslibros", $data);
 
             if ($u) {
                 $res["error"] = false;
                 $res["mensaje"] = "La creación se se realizó correctamente";
             } else {
-                $res["mensaje"] = "No se pudo crear la/s categoria/s";
+                $res["mensaje"] = "No se pudo crear la categoria";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'crearLibro':
+            $descripcion = $_POST["descripcion"];
+            $categoria = $_POST["categoria"];
+            $nombre = $_POST["nombre"];
+            $imagen = $_POST['imagen'];
+            
+            $data = "'" . $nombre . "', '" . $categoria . "', '" . $descripcion . "', '" . $imagen . "'";
+            
+            $u = $user -> insertar("libros", $data);
+        
+            if ($u) {
+                $res["error"] = false;
+                $res["mensaje"] = "La creación se realizó correctamente";
+            } else {
+                $res["mensaje"] = "No se pudo crear el libro";
                 $res["error"] = true;
             } 
 

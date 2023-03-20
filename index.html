@@ -273,7 +273,6 @@
                         //axios.post("http://localhost/proyectos/pedidosSiPueden/conexion/login.php?accion=login", formdata)
                         axios.post("conexion/login.php?accion=login", formdata)
                         .then(function(response){
-                            console.log(response.data);
                             if (response.data.error) {
                                 app.mostrarToast("Error", response.data.mensaje);
                             } else {
@@ -283,13 +282,12 @@
                                     localStorage.removeItem("usuario", app.usuario)
                                 }
                                 if (response.data.token == "d033e22ae348aeb5660fc2140aec35850c4da997") {
-                                    window.location.href = 'admin.php'; 
+                                    window.location.href = 'home.php'; 
                                 } else if (response.data.token == "b665e217b51994789b02b1838e730d6b93baa30f") {
                                     window.location.href = 'home.php'; 
                                 } else {
                                     window.location.href = 'index.html'; 
                                 }
-                                
                             }
                             app.loading = false;
                         }).catch( error => {
