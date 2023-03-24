@@ -175,17 +175,41 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 <div class="col-6 col-md-4 p-0" :id="'libro' + libro.id" >
                                     <div class="imgCard">
                                         <img  :src="retornarImagen(libro)"/>
-                                        <button type="button" class="btn botonSmallTrash" @click="eliminarLibro(libro.id, libro.nombre)" data-toggle="modal" data-target="#ModalCategoria">
+                                      
+                                        <button type="button" class="btn botonSmallTrash" @click="eliminarLibro(libro.id, libro.nombre)" data-toggle="modal" data-target="#ModalCategoria" v-if="usuarioAdmin == 'admin'">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                                                 <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
                                             </svg> ELIMINAR LIBRO
+                                        </button>
+
+                                        <button type="button" class="btn botonSmallAdd" @click="agregarLibroPedido(libro.id, libro.nombre)" v-if="usuarioAdmin != 'admin' && librosPedidos.filter(element =>element.id == libro.id).length == 0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
+                                                <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z"/>
+                                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                            </svg> AGREGAR
+
                                         </button> 
+
+                                        <button type="button" class="btn botonSmallTrash" @click="eliminarLibroPedido(libro.id, libro.nombre)" v-if="usuarioAdmin != 'admin' && librosPedidos.filter(element =>element.id == libro.id).length != 0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-dash" viewBox="0 0 16 16">
+                                                <path d="M6.5 7a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4z"/>
+                                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                            </svg> ELIMINAR
+                                        </button> 
+
+                                        <button type="button" class="btn botonSmallAgregado" readonly v-if="usuarioAdmin != 'admin' && librosPedidos.filter(element =>element.id == libro.id).length != 0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-check" viewBox="0 0 16 16">
+                                                <path d="M11.354 6.354a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
+                                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                            </svg> AGREGADO
+                                        </button> 
+                                      
                                     </div>
                                 </div>
                                 <div class="col-6 col-md-8 p-0" :id="'descripcion' + libro.id" >
                                     <div class="descripcionCard">
-                                        <div class="tituloLibro">{{libro.nombre}}</div>
+                                        <div class="tituloLibro">{{libro.nombre}} 
                                         <div class="descripcionLibro">
                                             {{libro.descripcion}}
                                         </div>
@@ -319,13 +343,32 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 </div>
               
             </div>
+            <span class="ir-arriba" v-if="scroll" @click="irArriba">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                </svg>
+            </span>
 
-        
         </div>
         
     </div>
 
-    <style scoped>     
+    <style scoped>  
+        .ir-arriba {
+            background-color: #7C4599;;
+            width: 35px;
+            height: 35px;
+            font-size:20px;
+            border-radius: 50%;
+            color:#fff;
+            cursor:pointer;
+            position: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            bottom:20px;
+            right:20%;
+        }   
         .verCategorias{
             width: 95%;
             margin-top: 10px;
@@ -384,13 +427,36 @@ if(time() - $_SESSION['login_time'] >= 1000){
             font-size: 13px;
             color: #7C4599;
         }
+        .botonSmallAdd{
+            font-size: 12px;
+            color: #7C4599;
+            padding: 0;
+            margin: 5px 0;
+        }
+        .botonSmallAdd:hover{
+            font-size: 13px;
+            color: #7C4599;
+        }
         .botonSmallTrash{
             font-size: 12px;
             color: red;
+            padding: 0;
+            margin: 5px 0;
         }
         .botonSmallTrash:hover{
             font-size: 13px;
             color: red;
+        }
+        .botonSmallAgregado{
+            font-size: 13px;
+            color: green;
+            border: solid 1px green;
+        }
+        .botonSmallAgregado:hover{
+            font-size: 13px;
+            color: green;
+            border: solid 1px green;
+            cursor: auto
         }
         .textareaDescripcion{
             margin:0!important;
@@ -556,6 +622,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
             components: {                
             },
             data: {
+                scroll: false,
                 showCategorias: false,
                 tituloToast: null,
                 textoToast: null,
@@ -593,7 +660,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 confirmLibro: false,
                 enviarCopia: false,
                 usuarioAdmin: false,
-                categoriaBusqueda: "0"
+                categoriaBusqueda: "0",
+                librosPedidos: []
             },
             computed: {
                 verArchivo() {
@@ -601,13 +669,42 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 }
             },
             mounted () {
+                let librosPedidos = JSON.parse(localStorage.getItem("librosPedidos"));
+                if (librosPedidos) {
+                    this.librosPedidos= librosPedidos;
+                }
                 this.usuarioAdmin = "<?php echo $rol; ?>";
                 this.consultarLibros();
                 this.consultarCategorias();
             },
+            beforeUpdate(){
+                window.onscroll = function (){
+                    // Obtenemos la posicion del scroll en pantall
+                    var scroll = document.documentElement.scrollTop || document.body.scrollTop;
+
+                    // Realizamos alguna accion cuando el scroll este entre la posicion 300 y 400
+                    if(scroll > 300 && scroll < 400){
+                        console.log("Pasaste la posicion 300 del scroll");
+                    }
+                }
+            },
             methods:{
+                agregarLibroPedido(id, nombre) {
+                    let libro = new Object();
+                    libro.id = id;
+                    libro.nombre = nombre;
+                    this.librosPedidos.push(libro);
+                    localStorage.setItem("librosPedidos", JSON.stringify(this.librosPedidos))
+                },
+                eliminarLibroPedido(id, nombre) {
+                    this.librosPedidos = this.librosPedidos.filter(element => element.id != id)
+                    localStorage.setItem("librosPedidos", JSON.stringify(this.librosPedidos))
+                },
                 irAHome () {
                     window.location.href = 'home.php';    
+                },
+                irArriba () {
+                    window.scrollTo(0, 0);   
                 },
                 eliminarLibro (id, nombre) {
                     this.libroEliminable.id = id;
@@ -918,6 +1015,14 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 }
             }
         })
+        window.addEventListener('scroll', function(evt) {
+            let blur = window.scrollY / 10;
+            if (blur == 0) {
+                app.scroll = false;
+            } else {
+                app.scroll = true;
+            }
+        }, false);
     </script>
 </body>
 </html>

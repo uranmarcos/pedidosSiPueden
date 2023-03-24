@@ -275,6 +275,8 @@
                             if (response.data.error) {
                                 app.mostrarToast("Error", response.data.mensaje);
                             } else {
+                                localStorage.removeItem("librosPedidos")
+                                localStorage.removeItem("listadoPedido")
                                 if (app.recordar) {
                                     localStorage.setItem("usuario", app.usuario)
                                 } else {

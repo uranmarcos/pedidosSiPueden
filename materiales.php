@@ -113,7 +113,10 @@ if (!$_SESSION["login"] ) {
                             <!-- START LISTADO CATEGORIAS NORMAL -->
                             <section class="col-12 col-md-3 px-0 mr-1 categorias">
                                 <div class="row contenedorBoton" v-for="item in categorias" >
-                                    <button :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" @click="changeCategoria(item)">
+                                    <button 
+                                        :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" 
+                                        @click="changeCategoria(item)"
+                                    >
                                         <span :class="categoria == item.id ? 'textoBtnRemarcado' : ''">
                                             {{item.descripcion}}
                                         </span>
@@ -130,9 +133,9 @@ if (!$_SESSION["login"] ) {
                                     </button>
                                 </p>
                                 <div class="collapse" id="collapseExample"> 
-                                    <div class="card card-body">
-                                        <div class="row contenedorBoton" v-for="item in categorias" >
-                                            <button :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" @click="changeCategoria(item)">{{item.descripcion}}</button>
+                                    <div class="row">
+                                        <div class="col-6 col-md-12 " v-for="item in categorias" >
+                                            <button  :class="categoria == item.id ? 'btnCategoriaSeleccionado' : 'btnCategoria'" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" @click="changeCategoria(item)">{{item.descripcion}}</button>
                                         </div>                                        
                                     </div>
                                 </div>
@@ -166,7 +169,7 @@ if (!$_SESSION["login"] ) {
                                                 </button>
                                             </div>
                                             <div v-else>
-                                                <div class="row rowArticulo" v-if="articulo.categoria != 'otros'">
+                                                <div class="row rowArticulo" v-if="articulo.categoria != 'otros' && articulo.categoria != 'libros'">
                                                     <div class="col-10 divInputCantidad">
                                                         <label class="labelNoMedible">{{articulo.descripcion}}</label>
                                                     </div>
@@ -174,9 +177,27 @@ if (!$_SESSION["login"] ) {
                                                         <input type="checkbox" v-model="articulo.cantidad">
                                                     </div>
                                                 </div>
-                                                <div class="row rowArticulo" v-else>
+                                                <div class="row rowArticulo" v-if="articulo.categoria == 'otros'">
                                                     <label for="otros"><span class="errorLabel" v-if="articulo.cantidad != null && articulo.cantidad.length == 200">Máximo 200 caracteres</span></label>
-                                                    <textarea class="otros" maxlength="200" v-model="articulo.cantidad"></textarea>
+                                                    <textarea class="otros" maxlength="200" @input="updateLocalSotare" v-model="articulo.cantidad"></textarea>
+                                                </div>
+                                                <div class="row rowArticulo" v-if="articulo.categoria == 'libros'">
+                                                    <div v-if="librosPedidos.length == 0" class="textoLibros">
+                                                        No tenés libros agregados. Podés hacerlo desde la <span class="destacado" @click="irABiblioteca">biblioteca</span>.
+                                                    </div>
+                                                    <div v-else>
+                                                        <div class="row rowArticulo" v-for="(libro, index) in librosPedidos">
+                                                            <div class="col-10 divLibro" :id="'libro' + index">
+                                                                - {{libro.nombre}}
+                                                            </div>
+                                                            <button class="botonAccion botonDelete col-1" @mouseover="marcarLibro(libro, index)" @mouseout="desmarcarLibro(libro, index)" @click="eliminarLibro(libro, index)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eraser-fill" viewBox="0 0 16 16">
+                                                                    <path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                       
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -188,8 +209,13 @@ if (!$_SESSION["login"] ) {
                                 <h6>TU PEDIDO:</h6>
                                 <div class="mb-3">
                                     <ul  v-for="articulo in listadoPedido">
-                                        <li v-if="articulo.cantidad != null && articulo.cantidad != 0" class="itemListado">
+                                        <li v-if="articulo.cantidad != null && articulo.cantidad != 0 && articulo.nombre != 'Libros'" class="itemListado">
                                             {{articulo.nombre}} {{articulo.medible || articulo.categoria == 'otros' ? ': ' + articulo.cantidad : ''}}
+                                        </li>
+                                        <li v-if="articulo.cantidad != null && articulo.cantidad != 0 && articulo.nombre == 'Libros'" class="itemListado">
+                                            Libros:
+                                            <br>
+                                            <span v-for="a in articulo.cantidad">- {{a}} <br></span>
                                         </li>
                                     </ul>
                                 </div>
@@ -299,6 +325,28 @@ if (!$_SESSION["login"] ) {
                 display: none;
             }
         }        
+        .remarcado{
+            height: 20px;
+            font-weight: bolder;
+            color: rgb(238, 100, 100) !important;
+        }
+        .divLibro{
+            height:30px;
+            display: flex;
+            align-items: center;
+            color: black
+        }
+        .textoLibros{
+            text-align: center;
+            color: grey
+        }
+        .destacado{
+            font-weight: bolder;
+            color: purple;
+        }
+        .destacado:hover{
+            cursor: pointer;
+        }
     </style>
     <script>
         var app = new Vue({
@@ -420,7 +468,8 @@ if (!$_SESSION["login"] ) {
                     {medible: true, categoria: "extras", nombre:"Tijeras infantiles", descripcion: "Tijeras infantiles", cantidad: null},
                     {medible: true, categoria: "extras", nombre:"Tizas blancas", descripcion: "Tizas blancas", cantidad: null},
                     {medible: true, categoria: "extras", nombre:"Tizas de colores", descripcion: "Tizas de colores", cantidad: null},
-                    {medible: false, categoria: "otros", nombre:"Otros", descripcion: "Otros", cantidad: null}
+                    {medible: false, categoria: "otros", nombre:"Otros", descripcion: "Otros", cantidad: null},
+                    {medible: false, categoria: "libros", nombre:"Libros", descripcion: "Libros", cantidad: null}
                 ],
                 categoria: null,
                 tituloCategoria: null,
@@ -434,8 +483,10 @@ if (!$_SESSION["login"] ) {
                     {id: "papelCrepe", descripcion: "PAPEL CREPE"},
                     {id: "temperas", descripcion: "TEMPERAS"},
                     {id: "extras", descripcion: "EXTRAS"},
-                    {id: "otros", descripcion: "OTROS"}
+                    {id: "otros", descripcion: "OTROS"},
+                    {id: "libros", descripcion: "LIBROS"}
                 ],
+                librosPedidos: [],
                 titulo: null,
                 textoToast: null,
                 mailCopia: null,
@@ -471,6 +522,21 @@ if (!$_SESSION["login"] ) {
                 ]
             },
             mounted () {
+                // CARGO SI TENGO EL PEDIDO EN LOCAL STORAGE
+                let listadoPedido = JSON.parse(localStorage.getItem("listadoPedido"));
+                if (listadoPedido) {
+                    this.listadoPedido = listadoPedido;
+                }
+                // CARGO SI TENGO EN STORAGE LIBROS CARGADOS
+                let librosPedidos = JSON.parse(localStorage.getItem("librosPedidos"));
+                if (librosPedidos) {
+                    let libros = [];
+                    librosPedidos.forEach(element => {
+                        libros.push(element.nombre)
+                    });
+                    this.librosPedidos = librosPedidos
+                    this.listadoPedido.filter(element => element.nombre=="Libros")[0].cantidad = libros
+                }
                 let envio = JSON.parse(localStorage.getItem("datosEnvio"));
                 if (envio) {
                     this.envio.nombre = envio.nombre;
@@ -487,6 +553,28 @@ if (!$_SESSION["login"] ) {
                 }
             },
             methods:{
+                irABiblioteca () {
+                    window.location.href = 'biblioteca.php';  
+                },
+                marcarLibro(libro, index) {
+                    document.getElementById("libro"+index).classList.add("remarcado")
+                },
+                desmarcarLibro(libro, index) {
+                    document.getElementById("libro"+index).classList.remove("remarcado")
+                },
+                eliminarLibro(libro, index) {
+                    this.librosPedidos = this.librosPedidos.filter(element => element.id != libro.id)
+                    localStorage.setItem("librosPedidos", JSON.stringify(this.librosPedidos))
+                    let libros = [];
+                    if (this.librosPedidos.length != 0) {
+                        this.librosPedidos.forEach(element => {
+                            libros.push(element.nombre)
+                        });
+                        this.listadoPedido.filter(element => element.nombre=="Libros")[0].cantidad = libros
+                    } else {
+                        this.listadoPedido.filter(element => element.nombre=="Libros")[0].cantidad = []
+                    }
+                },
                 habilitarBtnEnviar () {
                     return this.listadoPedido.find(element => element.cantidad != null) == undefined;
                 },
@@ -495,10 +583,14 @@ if (!$_SESSION["login"] ) {
                     this.tituloCategoria = this.categorias.filter(element => element.id == param.id)[0].descripcion;
                 },
                 changeCantidad (nombre, cantidad) {
+                    this.updateLocalSotare();
                     if (cantidad.length > 4) {
                         let cantidadModificada = cantidad.slice(0,4);
                         this.listadoPedido.filter(element => element.nombre == nombre)[0].cantidad = cantidadModificada;
                     }
+                },
+                updateLocalSotare() {
+                    localStorage.setItem("listadoPedido", JSON.stringify(this.listadoPedido));
                 },
                 irAHome () {
                     window.location.href = 'home.php';    
@@ -596,7 +688,7 @@ if (!$_SESSION["login"] ) {
                     formdata.append("codigoPostal", this.envio.codigoPostal);
                     formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
                     formdata.append("fecha", fecha);
-                    // formdata.append("mail", "marcos_uran@hotmail.com");
+                    //formdata.append("mail", "marcos_uran@hotmail.com");
                     formdata.append("mail", "laurapecorelli@hotmail.com.ar");
                     formdata.append("mailCopia", this.mailCopia);
                     
@@ -605,11 +697,17 @@ if (!$_SESSION["login"] ) {
                     
                     this.listadoPedido.forEach(element => {
                         if (element.cantidad != null && element.cantidad != false && element.cantidad != 0 && element.categoria != 'otros') {
-                            let elemento = null;
+                            let elemento = '';
                             if (element.medible) {
                                 elemento = element.nombre + ": " + element.cantidad + "; "; 
                             } else {
-                                elemento = element.nombre + "; ";
+                                if (element.categoria == 'libros') {
+                                    element.cantidad.forEach(e => {
+                                        elemento = elemento + 'Libro: ' + e + "; "; 
+                                    });
+                                } else {
+                                    elemento = element.nombre + "; ";
+                                }
                             }
                               
                             pedido = pedido + elemento;
@@ -621,17 +719,16 @@ if (!$_SESSION["login"] ) {
                     formdata.append("pedido", pedido);
                     formdata.append("otros", otros);
                    
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=enviarPedido", formdata)
-                    // axios.post("conexion/login.php?accion=login", formdata)
                     axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
                     .then(function(response){    
-                        console.log(response.data.tipo);
                         if (response.data.error) {
                             app.errorEnvio= true;
                             app.pedidoEnviado= false;
                         } else {
                             app.errorEnvio= false;
                             app.pedidoEnviado= true;
+                            localStorage.removeItem("librosPedidos")
+                            localStorage.removeItem("listadoPedido")
                         }
                         app.loading = false;
                     }).catch( error => {
