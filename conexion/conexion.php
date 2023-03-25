@@ -37,6 +37,15 @@ class ApptivaDB {
         }
     }
 
+    public function consultar($tabla, $condicion) {
+        try {
+            $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE $condicion") or die();
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
     public function eliminar($tabla, $condicion) {
         try {
             $resultado = $this->conexion->query("DELETE FROM $tabla WHERE $condicion") or die();

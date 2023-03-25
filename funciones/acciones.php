@@ -185,6 +185,83 @@
 
         break;
 
+        case 'consultarRecursos':
+            $tipo = $_POST["recurso"];
+            $u = $user -> consultar("recursos", $tipo);
+
+            if ($u || $u == []) { 
+                $res["planificaciones"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo recuperar las planificaciones";
+                $res["error"] = true;
+            } 
+
+        break;
+
+
+        //
+        //
+        //
+        case 'getRecursos':
+            $tipo = $_POST["recurso"];
+            $u = $user -> consultar("recursos", $tipo);
+
+            if ($u || $u == []) { 
+                $res["planificaciones"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo recuperar las planificaciones";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'getCategorias':
+            $tipo = $_POST["recurso"];
+            $condicion = "tipo = '". $tipo . "'";
+            // "id = ". $idLibro
+            // echo $condicion;
+            // echo "<br>";
+            // // echo $tipo;
+
+         
+            $u = $user -> consultar("categoriasrecursos", $condicion);
+
+            if ($u || $u == []) { 
+                $res["categorias"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo recuperar las categorias";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'postCategoria':
+            $tipo = $_POST["tipo"];
+            $categoria = $_POST["categoria"];
+
+            $data = "'" . $tipo  ."', '" . $categoria  . "'";
+            $u = $user -> insertar("categoriasrecursos", $data);
+
+            if ($u) {
+                $res["error"] = false;
+                $res["mensaje"] = "La categoria se creó correctamente";
+            } else {
+                $res["mensaje"] = "No se pudo crear la categoria";
+                $res["error"] = true;
+            } 
+
+        break;
+
+
+        //
+        //
+        //
         case 'buscarPorCategoria':
             $idCategoria = $_POST["idCategoria"];
 

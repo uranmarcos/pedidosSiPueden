@@ -44,8 +44,8 @@ if (!$_SESSION["login"] ) {
         
                 </div>
               </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('articulos')">
-                <div class="opciones disabled">
+              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('planificaciones')">
+                <div class="opciones">
                     Banco de planificaciones
                     <br>
                     <span class="avisoDisabled">(En construcción)</span>
