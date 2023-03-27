@@ -28,18 +28,9 @@ class ApptivaDB {
         }
     }
 
-    public function consultarLibros() {
-        try {
-            $resultado = $this->conexion->query("SELECT * FROM libros") or die();
-            return $resultado->fetch_all(MYSQLI_ASSOC);
-        } catch (\Throwable $th) {
-            return false;
-        }
-    }
-
     public function consultar($tabla, $condicion) {
         try {
-            $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE $condicion") or die();
+            $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE $condicion ORDER BY nombre ASC") or die();
             return $resultado->fetch_all(MYSQLI_ASSOC);
         } catch (\Throwable $th) {
             return false;
@@ -60,9 +51,11 @@ class ApptivaDB {
     public function buscarPorCategoria($idCategoria) {
         try {
             if ($idCategoria == 0) {
-                $resultado = $this->conexion->query("SELECT * FROM libros") or die();
+                $resultado = $this->conexion->query("SELECT * FROM recursos") or die();
             } else {
-                $resultado = $this->conexion->query("SELECT * FROM libros WHERE categoria = $idCategoria") or die();
+                $condicion = '%-' . $idCategoria . '-%';
+                // $resultado = $this->conexion->query("SELECT * FROM libros WHERE categoria = $idCategoria") or die();
+                $resultado = $this->conexion->query("SELECT * FROM recursos WHERE tipo = 'libro' AND categoria LIKE '$condicion'") or die();
             }
             return $resultado->fetch_all(MYSQLI_ASSOC);
         } catch (\Throwable $th) {
@@ -70,23 +63,6 @@ class ApptivaDB {
         }
     }
 
-    public function consultarcategorias() {
-        try {
-            $resultado = $this->conexion->query("SELECT * FROM categoriaslibros ORDER BY nombre ASC") or die();
-            return $resultado->fetch_all(MYSQLI_ASSOC);
-        } catch (\Throwable $th) {
-            return false;
-        }
-    }
-
-    public function crearCategoria($data) {
-        try {
-            $resultado = $this->conexion->query($data) or die();
-            return true;
-        } catch (\Throwable $th) {
-            return false;
-        }
-    }
 }
 
 ?>

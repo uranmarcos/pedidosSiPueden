@@ -172,48 +172,18 @@
 
         break;
 
-        case 'consultarLibros':
-            $u = $user -> consultarLibros();
-            if ($u || $u == []) { 
-                $res["libros"] = $u;
-                $res["mensaje"] = "La consulta se realizó correctamente";
-            } else {
-                $res["u"] = $u;
-                $res["mensaje"] = "No se pudo recuperar los pedidos";
-                $res["error"] = true;
-            } 
-
-        break;
-
-        case 'consultarRecursos':
-            $tipo = $_POST["recurso"];
-            $u = $user -> consultar("recursos", $tipo);
-
-            if ($u || $u == []) { 
-                $res["planificaciones"] = $u;
-                $res["mensaje"] = "La consulta se realizó correctamente";
-            } else {
-                $res["u"] = $u;
-                $res["mensaje"] = "No se pudo recuperar las planificaciones";
-                $res["error"] = true;
-            } 
-
-        break;
-
-
-        //
-        //
-        //
         case 'getRecursos':
             $tipo = $_POST["recurso"];
-            $u = $user -> consultar("recursos", $tipo);
+            $condicion = "tipo = '". $tipo . "'";
+
+            $u = $user -> consultar("recursos", $condicion);
 
             if ($u || $u == []) { 
-                $res["planificaciones"] = $u;
+                $res["archivos"] = $u;
                 $res["mensaje"] = "La consulta se realizó correctamente";
             } else {
                 $res["u"] = $u;
-                $res["mensaje"] = "No se pudo recuperar las planificaciones";
+                $res["mensaje"] = "Hubo un error al recuperar la información. Por favor recargue la página.";
                 $res["error"] = true;
             } 
 
@@ -222,12 +192,7 @@
         case 'getCategorias':
             $tipo = $_POST["recurso"];
             $condicion = "tipo = '". $tipo . "'";
-            // "id = ". $idLibro
-            // echo $condicion;
-            // echo "<br>";
-            // // echo $tipo;
-
-         
+                   
             $u = $user -> consultar("categoriasrecursos", $condicion);
 
             if ($u || $u == []) { 
@@ -258,11 +223,28 @@
 
         break;
 
+        case 'crearRecurso':
+            $tipo = $_POST["tipo"];
+            $nombre = $_POST["nombre"];
+            $categoria = $_POST["categoria"];
+            $descripcion = $_POST["descripcion"];
+            $archivo = $_POST['archivo'];
+            
+            $data = "'" . $tipo . "', '" . $nombre . "', '" . $categoria . "', '" . $descripcion . "', '" . $archivo . "'";
+            
+            $u = $user -> insertar("recursos", $data);
+        
+            if ($u) {
+                $res["error"] = false;
+                $res["mensaje"] = "El archivo se guardó correctamente";
+            } else {
+                $res["mensaje"] = "No se pudo guardar el archivo. Intente nuevamente";
+                $res["error"] = true;
+            } 
 
-        //
-        //
-        //
-        case 'buscarPorCategoria':
+        break;
+
+        case 'buscarLibrosPorCategoria':
             $idCategoria = $_POST["idCategoria"];
 
             $u = $user -> buscarPorCategoria($idCategoria);
@@ -277,65 +259,17 @@
 
         break;
 
+
         case 'eliminarLibro':
             $idLibro = $_POST["idLibro"];
 
-            $u = $user -> eliminar("libros", "id = ". $idLibro);
+            $u = $user -> eliminar("recursos", "id = ". $idLibro);
             if ($u || $u == []) { 
                 $res["libros"] = $u;
                 $res["mensaje"] = "El libro se eliminó correctamente";
             } else {
                 $res["u"] = $u;
                 $res["mensaje"] = "No se pudo eliminar el libro";
-                $res["error"] = true;
-            } 
-
-        break;
-
-        case 'consultarCategorias':
-            $u = $user -> consultarCategorias();
-
-            if ($u || $u == []) { 
-                $res["categorias"] = $u;
-                $res["mensaje"] = "La consulta se realizó correctamente";
-            } else {
-                $res["u"] = $u;
-                $res["mensaje"] = "No se pudo recuperar las categorias";
-                $res["error"] = true;
-            } 
-
-        break;
-
-        case 'crearCategoria':
-            $categoria = $_POST["categoria"];
-            $data = "'" . $categoria  . "'";
-            $u = $user -> insertar("categoriaslibros", $data);
-
-            if ($u) {
-                $res["error"] = false;
-                $res["mensaje"] = "La creación se se realizó correctamente";
-            } else {
-                $res["mensaje"] = "No se pudo crear la categoria";
-                $res["error"] = true;
-            } 
-
-        break;
-
-        case 'crearLibro':
-            $descripcion = $_POST["descripcion"];
-            $categoria = $_POST["categoria"];
-            $nombre = $_POST["nombre"];
-            $imagen = $_POST['imagen'];
-            
-            $data = "'" . $nombre . "', '" . $categoria . "', '" . $descripcion . "', '" . $imagen . "'";
-            
-            $u = $user -> insertar("libros", $data);
-        
-            if ($u) {
-                $res["error"] = false;
-                $res["mensaje"] = "La creación se realizó correctamente";
-            } else {
-                $res["mensaje"] = "No se pudo crear el libro";
                 $res["error"] = true;
             } 
 

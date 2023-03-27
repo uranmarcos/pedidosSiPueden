@@ -92,7 +92,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 value="libro.nombreImagen"
                             >
                         </div>
-                        <div class="mt-2">
+                        <!-- <div class="mt-2">
                             <label for="nombre">Categoria (*) <span class="errorLabel" v-if="errorCategoria">{{errorCategoria}}</span></label>
                             <select class="form-control" @change="changeCategoria(event.target.value)" name="categoria" id="categoria" v-model="libro.categoria">
                                 <option v-for="categoria in categorias" v-bind:value="categoria.id" >{{categoria.nombre}}</option>
@@ -103,7 +103,24 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                 </svg> AGREGAR CATEGORIA
                             </button> 
+                        </div> -->
+
+                        <div class="mt-2">
+                            <label for="nombre">Categoria (*) 
+                            <span class="errorLabel" v-if="errorCategoria">{{errorCategoria}}</span></label>
+                            <button type="button" class="btn botonSmall" @click="modal=true" data-toggle="modal" data-target="#ModalCategoria">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                </svg> AGREGAR CATEGORIA
+                            </button> 
+                            <div class="row my-3">
+                                <div class="col-6 categori<" v-for="categoria in categorias">
+                                    <input v-model="categoria.checked" @click="updateCategoria(categoria)" type="checkbox" value="categoria.id">
+                                    {{categoria.nombre}}
+                                </div>
+                            </div>                            
                         </div>
+
                         <div class="mt-2">
                             <label for="nombre">Nombre (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
                             <input class="form-control" autocomplete="off" maxlength="60" id="nombre" v-model="libro.nombre">
@@ -209,7 +226,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 </div>
                                 <div class="col-6 col-md-8 p-0" :id="'descripcion' + libro.id" >
                                     <div class="descripcionCard">
-                                        <div class="tituloLibro">{{libro.nombre}} 
+                                        <div class="tituloLibro">{{libro.nombre}}</div>
                                         <div class="descripcionLibro">
                                             {{libro.descripcion}}
                                         </div>
@@ -261,20 +278,20 @@ if(time() - $_SESSION['login_time'] >= 1000){
 
                             <div class="modal-footer d-flex justify-content-between" v-if="confirmCategorias">
                                 <div class="row rowBotones f-dlex justify-content-center my-3">
-                                    ¿Confirma la creación de la/s categoria/s?
+                                    ¿Confirma la creación de la categoria?
                                 </div>
 
-                                <button type="button" class="btn boton" :disabled="loading" @click="confirmCategorias = false">Cancelar</button>
+                                <button type="button" class="btn boton" :disabled="creandoCategorias" @click="confirmCategorias = false">Cancelar</button>
                                 
-                                <button type="button" @click="crearCategorias" class="btn boton" v-if="!loading">
+                                <button type="button" @click="crearCategorias" class="btn boton" v-if="!creandoCategorias">
                                     Confirmar
                                 </button>
 
                                 <button 
                                     class="btn boton"
-                                    v-if="loading" 
+                                    v-if="creandoCategorias" 
                                 >
-                                    <div class="loading">
+                                    <div class="creandoCategorias">
                                         <div class="spinner-border" role="status">
                                             <span class="sr-only"></span>
                                         </div>
@@ -628,6 +645,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 textoToast: null,
                 buscandoLibros: false,
                 buscandoCategorias: false,
+                creandoCategorias: false,
                 libros: [],
                 categorias: [],
                 libro: {
@@ -740,14 +758,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         this.modal = false
                     }
                 },
-                verDescripcion (id) {
-                    document.getElementById("libro"+id).classList.add("hide")
-                    document.getElementById("descripcion"+id).classList.remove("hide")
-                },
-                ocultarDescripcion (id) {
-                    document.getElementById("libro"+id).classList.remove("hide")
-                    document.getElementById("descripcion"+id).classList.add("hide")
-                },
                 subirImagen () {
                     const $seleccionArchivos = document.querySelector("#seleccionArchivos"),
                     $imagenPrevisualizacion = document.querySelector("#imagenPrevisualizacion");
@@ -762,17 +772,18 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     // Lo convertimos a un objeto de tipo objectURL
                     const objectURL = URL.createObjectURL(primerArchivo);
                  
-                    this.libro.imagen = objectURL
+                    this.libro.archivo = objectURL
                     // Y a la fuente de la imagen le ponemos el objectURL
                     $imagenPrevisualizacion.src = objectURL;
                 },
                 retornarImagen(param){
-                    return param.imagen
+                    return param.archivo
                 },
                 consultarCategorias () {
                     this.buscandoCategorias = true;
-                    axios.post("funciones/acciones.php?accion=consultarCategorias")
-                    //axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=consultarCategorias")
+                    let formdata = new FormData();
+                    formdata.append("recurso", "libros");
+                    axios.post("funciones/acciones.php?accion=getCategorias", formdata)
                     .then(function(response){
                         app.buscandoCategorias = false;
                         if (response.data.error) {
@@ -787,41 +798,43 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     let formdata = new FormData();
                     formdata.append("idCategoria", app.categoriaBusqueda);
 
-                    axios.post("funciones/acciones.php?accion=buscarPorCategoria", formdata)
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=buscarPorCategoria", formdata)
+                    axios.post("funciones/acciones.php?accion=buscarLibrosPorCategoria", formdata)
                     .then(function(response){    
                         app.buscandoLibros = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
-                            app.libros = response.data.libros;
-                            app.libros.forEach(element => {
-                                if (element.imagen !== null) {
-                                    const blob = app.dataURItoBlob(element.imagen)
-                                    const url = URL.createObjectURL(blob)
-                                    element.imagen = url
-                                    // element.imagen = "img/"+ element.imagen
-                                }
-                            })
+                            if (response.data.libros != false) {
+                                app.libros = response.data.libros;
+                                app.libros.forEach(element => {
+                                    if (element.archivo !== null) {
+                                        const blob = app.dataURItoBlob(element.archivo)
+                                        const url = URL.createObjectURL(blob)
+                                        element.archivo = url
+                                    }
+                                })
+                            } else {
+                                app.libros = [];
+                            }
                         }
                     });
                 },
                 consultarLibros() {
                     this.buscandoLibros = true;
-                    axios.post("funciones/acciones.php?accion=consultarLibros")
-                    //axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=consultarLibros")
+                    let formdata = new FormData();
+                    formdata.append("recurso", "libro");
+                    axios.post("funciones/acciones.php?accion=getRecursos", formdata)
                     .then(function(response){    
                         app.buscandoLibros = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
-                            app.libros = response.data.libros;
+                            app.libros = response.data.archivos;
                             app.libros.forEach(element => {
-                                if (element.imagen !== null) {
-                                    const blob = app.dataURItoBlob(element.imagen)
+                                if (element.archivo !== null) {
+                                    const blob = app.dataURItoBlob(element.archivo)
                                     const url = URL.createObjectURL(blob)
-                                    element.imagen = url
-                                    // element.imagen = "img/"+ element.imagen
+                                    element.archivo = url
                                 }
                             })
                         }
@@ -869,11 +882,10 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     app.creandoCategorias = true;
                     let formdata = new FormData();
                     formdata.append("categoria", app.nuevaCategoria);
+                    formdata.append("tipo", "libros");
           
-                    axios.post("funciones/acciones.php?accion=crearCategoria", formdata)
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearCategoria", formdata)
+                    axios.post("funciones/acciones.php?accion=postCategoria", formdata)
                     .then(function(response){
-                        console.log(response.data);
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
@@ -928,11 +940,15 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 crearLibro () {
                     let error = false;
                     this.resetErroresNuevoLibro();
-                    if (this.libro.imagen == null) {
+                    if (this.libro.archivo == null) {
                         this.errorImagen = "Campo requerido";
                         error = true;
                     }
-                    if (this.libro.categoria == null || this.libro.categoria == "crearCategoria") {
+                    // if (this.libro.categoria == null || this.libro.categoria == "crearCategoria") {
+                    //     this.errorCategoria = "Campo requerido";
+                    //     error = true;
+                    // }
+                    if (this.categorias.filter(element => element.checked).length == 0) {
                         this.errorCategoria = "Campo requerido";
                         error = true;
                     }
@@ -951,11 +967,21 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 confirmarLibro () {
                     app.creandoLibro = true;
                     let formdata = new FormData();
-                    formdata.append("categoria", app.libro.categoria);
-                    formdata.append("imagen", app.libro.imagen);
+                    formdata.append("tipo", "libro");
+
+                    let categorias = "-";
+                    app.categorias.forEach(element => {
+                        if (element.checked) {
+                            categorias = categorias + element.id + "-"
+                        }    
+                    });
+                    formdata.append("categoria", categorias);
+                   // formdata.append("categoria", app.libro.categoria);
+                    formdata.append("archivo", app.libro.archivo);
                     formdata.append("nombre", app.libro.nombre);
                     formdata.append("descripcion", app.libro.descripcion);
-                    axios.post("funciones/acciones.php?accion=crearLibro", formdata)
+                    //axios.post("funciones/acciones.php?accion=crearLibro", formdata)
+                    axios.post("funciones/acciones.php?accion=crearRecurso", formdata)
                     // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearLibro", formdata)
                     .then(function(response){
                         console.log(response.data);
@@ -1009,7 +1035,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
             watch: {
                 verArchivo () {
                     if (this.pdfbase64) {
-                        this.libro.imagen = this.pdfbase64;
+                        this.libro.archivo = this.pdfbase64;
                     }
 
                 }
