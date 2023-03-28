@@ -92,18 +92,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 value="libro.nombreImagen"
                             >
                         </div>
-                        <!-- <div class="mt-2">
-                            <label for="nombre">Categoria (*) <span class="errorLabel" v-if="errorCategoria">{{errorCategoria}}</span></label>
-                            <select class="form-control" @change="changeCategoria(event.target.value)" name="categoria" id="categoria" v-model="libro.categoria">
-                                <option v-for="categoria in categorias" v-bind:value="categoria.id" >{{categoria.nombre}}</option>
-                                <option value="crearCategoria">Crear categoria</option>
-                            </select>
-                            <button type="button" class="btn botonSmall" @click="modal=true" data-toggle="modal" data-target="#ModalCategoria">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                </svg> AGREGAR CATEGORIA
-                            </button> 
-                        </div> -->
 
                         <div class="mt-2">
                             <label for="nombre">Categoria (*) 
@@ -115,7 +103,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                             </button> 
                             <div class="row my-3">
                                 <div class="col-6 categori<" v-for="categoria in categorias">
-                                    <input v-model="categoria.checked" @click="updateCategoria(categoria)" type="checkbox" value="categoria.id">
+                                    <input v-model="categoria.checked" type="checkbox" value="categoria.id">
                                     {{categoria.nombre}}
                                 </div>
                             </div>                            
@@ -129,7 +117,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     <div class="col-sm-12 col-md-4 mt-3">
                         <div>
                             <label for="nombre">Descripción (*) <span class="errorLabel" v-if="errorDescripcion">{{errorDescripcion}}</span></label>
-                            <textarea class="form-control textareaDescripcion" maxlength="400" v-model="libro.descripcion"></textarea>
+                            <textarea class="form-control textareaDescripcion" maxlength="700" v-model="libro.descripcion"></textarea>
                         </div>
                     </div>
                 </div>                   
@@ -165,7 +153,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
             <!-- END ABM LIBROS -->
 
             <div class="row rowBotones d-flex justify-content-between">     
-                <select class="form-control selectCategoria" @change="buscarPorCategoria(event.target.value)" v-model="categoriaBusqueda">
+                <select class="form-control selectCategoria" @change="page= 1, consultarLibros()" v-model="categoriaBusqueda">
+                <!-- <select class="form-control selectCategoria" @change="buscarPorCategoria(event.target.value)" v-model="categoriaBusqueda"> -->
                     <option value="0" >Todas las categorias</option>
                     <option v-for="categoria in categorias" v-bind:value="categoria.id" >{{categoria.nombre}}</option>
                 </select>
@@ -184,9 +173,90 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     </div>
                     <!-- END COMPONENTE LOADING BUSCANDO LIBROS -->
 
+                    <div class="contenedorABM py-3" v-if="verCarrito && !buscandoLibros" id="carrito">    
+                        <span class="subtituloCard">LIBROS PEDIDOS</span>
+                        <ul v-for="libro in librosPedidos">
+                            <li class="itemListado my-2">
+                                <span @click="irALibro(libro.id)" class="pointer"> {{libro.nombre}} <br></span>
+                            </li>
+                        </ul>
+                        <hr>
+                        <article>
+                            <span class="subtituloCard">DATOS PARA EL ENVIO</span>
+                            <div class="px-3 mt-3 row">
+                                <div class="col-sm-12 col-md-6">
+                                    <label for="nombre">Nombre Sí Pueden (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
+                                    <input class="form-control" autocomplete="off" maxlength="60" id="nombre" v-model="envio.nombre">
+                                </div>
+                                <div class="col-sm-12 col-md-6  mt-3 mt-md-0">
+                                    <label for="nombre">Nombre y apellido del voluntario (*) <span class="errorLabel" v-if="errorNombreVoluntario">{{errorNombreVoluntario}}</span></label>
+                                    <input class="form-control" autocomplete="off" maxlength="60" id="nombreVoluntario" v-model="envio.nombreVoluntario">
+                                </div>
+                                <div class="col-12 subtitleEnvio">
+                                    <label>Dirección (del voluntario)</label>
+                                </div>
+                                
+                                <div class="col-sm-12 col-md-6 mt-3">
+                                    <label for="direccion">Calle y número (*)<span class="errorLabel" v-if="errorDireccion">{{errorDireccion}}</span></label>
+                                    <input class="form-control" autocomplete="off" maxlength="50" id="direccion" v-model="envio.direccion">
+                                </div>
+                                <div class="col-sm-6 col-md-3 mt-3">
+                                    <label for="piso">Piso</label>
+                                    <input class="form-control" autocomplete="off" maxlength="5" id="direccion" v-model="envio.piso">
+                                </div>
+                                <div class="col-sm-6 col-md-3 mt-3">
+                                    <label for="dpto">Dpto.</label>
+                                    <input class="form-control" autocomplete="off" maxlength="5" id="ciudad" v-model="envio.dpto">
+                                </div>
+                                <div class="col-sm-12 col-md-6 mt-3">
+                                    <label for="ciudad">Ciudad (*) <span class="errorLabel" v-if="errorCiudad">{{errorCiudad}}</span></label>
+                                    <input class="form-control" autocomplete="off" maxlength="30" id="ciudad" v-model="envio.ciudad">
+                                </div>
+                                <div class="col-sm-12 col-md-6 mt-3">
+                                    <label for="provincia">Provincia (*) <span class="errorLabel" v-if="errorProvincia">{{errorProvincia}}</span></label>
+                                    <select class="form-control" name="provincia" id="provincia" v-model="envio.provincia">
+                                        <option v-for="provincia in provincias" v-bind:value="provincia" >{{provincia}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-12 col-md-6 mt-3">
+                                    <label for="ciudad">Código Postal (*) <span class="errorLabel" v-if="errorCodigoPostal">{{errorCodigoPostal}}</span></label>
+                                    <input class="form-control" autocomplete="off" maxlength="8" id="codigoPostal" v-model="envio.codigoPostal">
+                                </div>
+                                <div class="col-sm-12 col-md-6 mt-3">
+                                    <label for="provincia">Teléfono (*) <span class="errorLabel" v-if="errorTelefono">{{errorTelefono}}</span></label>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <input class="form-control" autocomplete="off" maxlength="4" id="telefono" v-model="envio.caracteristica">
+                                        </div> 
+                                        <div class="col-1">
+                                            -
+                                        </div> 
+                                        <div class="col-8">
+                                            <input class="col-sm-9 form-control" autocomplete="off" maxlength="9" id="telefono" v-model="envio.telefono">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-3 mt-3 row rowBotonesEnvio">
+                                <div class="col-6 p-0">
+                                    <input type="checkbox" v-model="recordarDatos">
+                                    <label @click="recordarDatos = !recordarDatos" class="pointer">Recordar</label>
+                                </div>
+                                <div class="col-12 pr-0 d-flex justify-content-between">
+                                    <button type="button" @click="verCarrito=false" class="btn boton">
+                                        Ocultar Carrito
+                                    </button>
+                                    <button type="button" @click="continuar()" class="btn boton">
+                                        Generar pedido
+                                    </button>
+                                </div>
+                            </div>
+                        </article>                        
+                    </div>
+
                   
                 
-                    <div v-if="libros.length != 0" class="row contenedorLibros d-flex justify-content-around">
+                    <div v-if="libros.length != 0 && !buscandoLibros" class="row contenedorLibros d-flex justify-content-around">
                         <article class="col-12 col-lg-6" v-for="libro  in libros">
                             <div class="row rowCard">
                                 <div class="col-6 col-md-4 p-0" :id="'libro' + libro.id" >
@@ -215,11 +285,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                             </svg> ELIMINAR
                                         </button> 
 
-                                        <button type="button" class="btn botonSmallAgregado" readonly v-if="usuarioAdmin != 'admin' && librosPedidos.filter(element =>element.id == libro.id).length != 0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-check" viewBox="0 0 16 16">
-                                                <path d="M11.354 6.354a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
-                                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                                            </svg> AGREGADO
+                                        <button type="button" @click="mostrarCarrito" :disabled="verCarrito" class="btn botonSmallAgregado" v-if="usuarioAdmin != 'admin' && librosPedidos.length != 0">
+                                            VER CARRITO({{librosPedidos.length}})
                                         </button> 
                                       
                                     </div>
@@ -234,8 +301,29 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 </div>
                             </div>
                         </article>
+                        <div class="row mt-3 mb-5 paginacion">
+                            <div class="col-4">
+                                <button @click="prev" class="btnPaginacion pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                                        <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="col-4 d-flex justify-content-center">
+                            {{page * 5 - 4}} a {{page * 5 > cantidadRecursos ? cantidadRecursos : page * 5}} de {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}}
+                            <!-- Página {{page}} de {{Math.ceil(cantidadRecursos/5)}} /    {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}} -->
+                            </div>
+                            <div class="col-4 d-flex justify-content-end">
+                                <button  class="btnPaginacion pointer" @click="next">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                                        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div> 
-                    <div class="contenedorTabla" v-else>
+
+                    <div class="contenedorTabla" v-if="libros.length == 0 && !buscandoLibros">
                         <span class="sinResultados">
                             NO SE ENCONTRÓ RESULTADOS PARA MOSTRAR
                         </span>
@@ -342,6 +430,70 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     </div>
                 </div>    
                 <!-- MODAL CATEGORIAS -->
+
+                <!-- Modal -->
+                <div v-if="modalPedido">
+                    <div id="myModal" class="modal">
+                        <div class="modal-content p-0">
+                            <div class="modal-header  d-flex justify-content-center">
+                                <h5 class="modal-title" id="ModalLabel">CONFIRMACIÓN</h5>
+                            </div>
+
+                            <div class="modal-body row d-flex justify-content-center" v-if="!errorEnvio && !pedidoEnviado">
+                                <div class="col-12 confirmacion">
+                                    ¿Desea enviar el pedido?
+                                </div>    
+                                <div class="col-12 copia">
+                                    <input type="checkbox" @click="mailCopia = null" v-model="enviarCopia">
+                                    <label>Quiero recibir una copia en mi correo</label>
+                                </div>                              <br>    
+                                <div class="col-12" v-if="enviarCopia">
+                                    <input class="inputCopia" :class="errorMail ? 'inputError' : ''" type="text" v-model="mailCopia">
+                                </div>
+                            </div>
+
+                            <div class="modal-body row d-flex justify-content-center" v-if="errorEnvio">
+                                <div class="col-12 confirmacion">
+                                    Hubo un error y el pedido no se pudo enviar. Por favor intente nuevamente.
+                                </div>    
+                            </div>
+
+                            <div class="modal-body row d-flex justify-content-center" v-if="pedidoEnviado && !errorEnvio">
+                                <div class="col-12 confirmacion">
+                                    ¡El pedido se envió correctamente! :)
+                                </div>    
+                            </div>
+                            
+
+                            <div class="modal-footer d-flex justify-content-between" v-if="!pedidoEnviado">
+                                <button type="button" class="btn boton" @click="errorEnvio =false, modalPedido= false" :disabled="loading" data-dismiss="modal">Cancelar</button>
+                                
+                                <button type="button" @click="confirmar()" class="btn boton" v-if="!loading">
+                                    Confirmar
+                                </button>
+
+                                <button 
+                                    class="btn boton"
+                                    v-if="loading" 
+                                >
+                                    <div class="loading">
+                                        <div class="spinner-border" role="status">
+                                            <span class="sr-only"></span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div class="modal-footer d-flex justify-content-center" v-if="!errorEnvio && pedidoEnviado">
+
+                                <button type="button" @click="terminar()" class="btn boton" v-if="!loading">
+                                    Aceptar
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                           
                 <!-- NOTIFICACION -->
@@ -371,6 +523,15 @@ if(time() - $_SESSION['login_time'] >= 1000){
     </div>
 
     <style scoped>  
+        .paginacion{
+            color: grey;
+            font-size: 14px;
+        }
+        .btnPaginacion{
+            border: none;
+            background: white;
+            color: #7C4599;
+        }
         .ir-arriba {
             background-color: #7C4599;;
             width: 35px;
@@ -639,6 +800,14 @@ if(time() - $_SESSION['login_time'] >= 1000){
             components: {                
             },
             data: {
+                page: 1,
+                cantidadRecursos: 0,
+                verCarrito: false,
+                modalPedido:false,
+                mailCopia: null,
+                errorEnvio: false,
+                pedidoEnviado: false,
+                errorMail: false,
                 scroll: false,
                 showCategorias: false,
                 tituloToast: null,
@@ -646,6 +815,52 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 buscandoLibros: false,
                 buscandoCategorias: false,
                 creandoCategorias: false,
+                //
+                provincias: [
+                    "Buenos Aires",
+                    "CABA",
+                    "Catamarca",
+                    "Chaco",
+                    "Chubut",
+                    "Córdoba",
+                    "Corrientes",
+                    "Entre Ríos",
+                    "Formosa",
+                    "Jujuy",
+                    "La Pampa",
+                    "La Rioja",
+                    "Mendoza",
+                    "Misiones",
+                    "Neuquén",
+                    "Río Negro",
+                    "Salta",
+                    "San Juan",
+                    "San Luis",
+                    "Santa Cruz",
+                    "Santa Fe",
+                    "Santiago del Estero",
+                    "Tierra del Fuego",
+                    "Tucumán"
+                ],
+                recordarDatos: false,
+                envio: {
+                    nombre: null,
+                    nombreVoluntario: null,
+                    direccion: null,
+                    ciudad: null,
+                    provincia: null,
+                    codigoPostal: null,
+                    caracteristica: null,
+                    telefono: null,
+                },
+                errorNombre: null,
+                errorDireccion: null,
+                errorCiudad: null,
+                errorProvincia: null,
+                errorTelefono: null,
+                errorCodigoPostal: null,
+                errorNombreVoluntario: null,
+                //
                 libros: [],
                 categorias: [],
                 libro: {
@@ -687,9 +902,24 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 }
             },
             mounted () {
+                this.consultarCantidad();
                 let librosPedidos = JSON.parse(localStorage.getItem("librosPedidos"));
                 if (librosPedidos) {
                     this.librosPedidos= librosPedidos;
+                }
+                let envio = JSON.parse(localStorage.getItem("datosEnvio"));
+                if (envio) {
+                    this.envio.nombre = envio.nombre;
+                    this.envio.nombreVoluntario = envio.nombreVoluntario;
+                    this.envio.direccion = envio.direccion;
+                    this.envio.piso = envio.piso;
+                    this.envio.dpto = envio.dpto;
+                    this.envio.ciudad = envio.ciudad;
+                    this.envio.provincia = envio.provincia;
+                    this.envio.codigoPostal = envio.codigoPostal;
+                    this.envio.caracteristica = envio.caracteristica;
+                    this.envio.telefono = envio.telefono;
+                    this.recordarDatos = true;
                 }
                 this.usuarioAdmin = "<?php echo $rol; ?>";
                 this.consultarLibros();
@@ -699,14 +929,16 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 window.onscroll = function (){
                     // Obtenemos la posicion del scroll en pantall
                     var scroll = document.documentElement.scrollTop || document.body.scrollTop;
-
-                    // Realizamos alguna accion cuando el scroll este entre la posicion 300 y 400
-                    if(scroll > 300 && scroll < 400){
-                        console.log("Pasaste la posicion 300 del scroll");
-                    }
                 }
             },
             methods:{
+                mostrarCarrito() {
+                    this.verCarrito = true;
+                    this.irArriba();
+                },
+                irALibro (id) {
+                    document.getElementById("libro"+id).scrollIntoView();
+                },
                 agregarLibroPedido(id, nombre) {
                     let libro = new Object();
                     libro.id = id;
@@ -717,6 +949,9 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 eliminarLibroPedido(id, nombre) {
                     this.librosPedidos = this.librosPedidos.filter(element => element.id != id)
                     localStorage.setItem("librosPedidos", JSON.stringify(this.librosPedidos))
+                    if (this.librosPedidos.length == 0) {
+                        this.verCarrito = false;
+                    }
                 },
                 irAHome () {
                     window.location.href = 'home.php';    
@@ -797,6 +1032,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     this.buscandoLibros = true;
                     let formdata = new FormData();
                     formdata.append("idCategoria", app.categoriaBusqueda);
+                    this.consultarCantidad()
 
                     axios.post("funciones/acciones.php?accion=buscarLibrosPorCategoria", formdata)
                     .then(function(response){    
@@ -819,24 +1055,67 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         }
                     });
                 },
+                consultarCantidad () {
+                    let categoria = this.categoriaBusqueda;
+                    let formdata = new FormData();
+                    formdata.append("categoria", this.categoriaBusqueda);
+
+                    axios.post("funciones/acciones.php?accion=contarLibros", formdata)
+                    .then(function(response){    
+                        if (response.data.error) {
+                            app.mostrarToast("Error", response.data.mensaje);
+                        } else {
+                            if (response.data.cantidad != false) {
+                                app.cantidadRecursos = response.data.cantidad
+                            } else {
+                                app.cantidadRecursos = 0;
+                            }
+                        }
+                    });
+                },
+                prev() {
+                    if(this.page > 1) {
+                        this.page = this.page - 1;
+                        this.consultarLibros();
+                    }
+                },
+                next() {
+                    if (Math.ceil(this.cantidadRecursos/5) > this.page) {
+                        this.page = this.page + 1;
+                        this.consultarLibros();
+                    }
+                },
                 consultarLibros() {
                     this.buscandoLibros = true;
                     let formdata = new FormData();
                     formdata.append("recurso", "libro");
+                    formdata.append("idCategoria", this.categoriaBusqueda);
+                    if (this.page == 1) {
+                        formdata.append("inicio", 0);
+                    } else {
+                        formdata.append("inicio", ((app.page -1) * 5));
+                    }
+                    this.consultarCantidad()
+
                     axios.post("funciones/acciones.php?accion=getRecursos", formdata)
                     .then(function(response){    
                         app.buscandoLibros = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
-                            app.libros = response.data.archivos;
-                            app.libros.forEach(element => {
-                                if (element.archivo !== null) {
-                                    const blob = app.dataURItoBlob(element.archivo)
-                                    const url = URL.createObjectURL(blob)
-                                    element.archivo = url
-                                }
-                            })
+                            if (response.data.archivos != false) {
+                                app.libros = response.data.archivos;
+                                // console.log(app.libros);
+                                app.libros.forEach(element => {
+                                    if (element.archivo !== null) {
+                                        const blob = app.dataURItoBlob(element.archivo)
+                                        const url = URL.createObjectURL(blob)
+                                        element.archivo = url
+                                    }
+                                })
+                            } else {
+                                app.libros = []
+                            }
                         }
                     });
                 },
@@ -903,6 +1182,134 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 },
                 // END FUNCIONES CATEGORIA
 
+                continuar () {
+                    this.modalPedido = false;
+                    this.resetErrores();
+                    if (this.envio.nombre != null && this.envio.nombre.trim() != '' &&
+                        this.envio.nombreVoluntario != null && this.envio.nombreVoluntario.trim() != '' &&
+                        this.envio.direccion != null && this.envio.direccion.trim() != '' &&
+                        this.envio.ciudad != null && this.envio.ciudad.trim() != '' &&
+                        this.envio.provincia != null && this.envio.provincia.trim() != '' &&
+                        this.envio.codigoPostal != null && this.envio.codigoPostal.trim() != '' &&
+                        this.envio.caracteristica != null && this.envio.caracteristica.trim() != '' &&
+                        this.envio.telefono != null && this.envio.telefono.trim() != '')
+                    {
+                        this.modalPedido = true;
+                        if (this.recordarDatos) {
+                            localStorage.setItem("datosEnvio", JSON.stringify(this.envio))
+                        } else {
+                            localStorage.removeItem("datosEnvio")
+                        }
+                    } else {
+                        if (this.envio.nombre == null || this.envio.nombre.trim() == '') {
+                            this.errorNombre = "Campo requerido";
+                        }
+                        if (this.envio.nombreVoluntario == null || this.envio.nombreVoluntario.trim() == '') {
+                            this.errorNombreVoluntario = "Campo requerido";
+                        }
+                        if (this.envio.direccion == null || this.envio.direccion.trim() == '') {
+                            this.errorDireccion = "Campo requerido";
+                        }
+                        if (this.envio.ciudad == null || this.envio.ciudad.trim() == '') {
+                            this.errorCiudad = "Campo requerido";
+                        }
+                        if (this.envio.provincia == null || this.envio.provincia.trim() == '') {
+                            this.errorProvincia = "Campo requerido";
+                        }
+                        if (this.envio.codigoPostal == null || this.envio.codigoPostal.trim() == '') {
+                            this.errorCodigoPostal = "Campo requerido";
+                        }
+                        if (this.envio.caracteristica == null || this.envio.caracteristica.trim() == '' || this.envio.telefono == null || this.envio.telefono.trim() == '') {
+                            this.errorTelefono = "Campo requerido";
+                        }
+                    }
+                },
+                resetErrores() {
+                    this.errorNombre= null
+                    this.errorDireccion= null
+                    this.errorCiudad= null
+                    this.errorProvincia= null
+                    this.errorTelefono= null
+                    this.errorCodigoPostal= null                
+                },
+                validarMail (mail) {
+                    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+                        return (true)
+                    }
+                    return (false)
+                },
+                confirmar () {
+                    this.errorMail = false;
+                    if (this.enviarCopia) {
+                        if (this.mailCopia == null || this.mailCopia.trim() == '') {
+                            this.errorMail = true;
+                            return;
+                        } else {
+                            if (!this.validarMail(this.mailCopia)) {
+                                this.errorMail = true;
+                                return;
+                            }
+                        }
+                    }
+                    this.loading= true;
+                    let formdata = new FormData();
+                    const tiempoTranscurrido = Date.now();
+                    const hoy = new Date(tiempoTranscurrido);
+                    let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getYear();
+
+                    formdata.append("nombreSiPueden", this.envio.nombre);
+                    formdata.append("nombreVoluntario", this.envio.nombreVoluntario);
+                    formdata.append("direccionEnvio", this.envio.direccion);
+                    
+                    let direccion = this.envio.direccion;
+                    if (this.envio.piso != null && this.envio.piso.trim() != '') {
+                        direccion = direccion + ". Piso: " + this.envio.piso;
+                    }
+                    if (this.envio.dpto != null && this.envio.dpto.trim() != '') {
+                        direccion = direccion + ". Dpto: " + this.envio.dpto;
+                    }
+                    formdata.append("direccionEnvio", direccion);
+
+                    formdata.append("ciudad", this.envio.ciudad);
+                    formdata.append("provincia", this.envio.provincia);
+                    formdata.append("codigoPostal", this.envio.codigoPostal);
+                    formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
+                    formdata.append("fecha", fecha);
+                    // formdata.append("mail", "marcos_uran@hotmail.com");
+                    formdata.append("mail", "biblioteca@fundacionsi.org.ar");
+                    formdata.append("mailCopia", this.mailCopia);
+                    
+                    let pedido = '';
+                  
+                    this.librosPedidos.forEach(element => {                              
+                        pedido = pedido + element.nombre+ "; ";
+                    });
+                    formdata.append("pedido", pedido);
+                   
+                   
+                    axios.post("funciones/acciones.php?accion=enviarPedidoLibros", formdata)
+                    .then(function(response){    
+                        if (response.data.error) {
+                            app.errorEnvio= true;
+                            app.pedidoEnviado= false;
+                        } else {
+                            app.errorEnvio = false;
+                            app.pedidoEnviado = true;
+                            app.verCarrito = false;
+                            localStorage.removeItem("librosPedidos")
+                        }
+                        app.loading = false;
+                    }).catch( error => {
+                        app.errorEnvio= true;
+                        app.pedidoEnviado= false;
+                        app.loading = false;
+                    })                
+                },
+                terminar () {
+                    window.location.href = 'home.php'; 
+                },
+
+
                 // START MODAL LIBRO
                 showABMLibro (param) {
                     this.modalLibros = !param
@@ -917,7 +1324,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     this.resetNuevoLibro();
                 },
                 processFile(event) {
-                    console.log(event.target.files[0])
                     if (event != undefined) {
                         this.archivo = event;
                         let reader = new FileReader();
@@ -990,6 +1396,9 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         } else {
                             app.modalLibros = false;
                             app.confirmLibro = false;
+                            app.categorias.forEach(element => {
+                                element.checked = false;
+                            });
                             app.mostrarToast("Éxito", response.data.mensaje);
                             app.consultarLibros();
                             app.resetNuevoLibro();
@@ -1008,7 +1417,9 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 },
                 resetNuevoLibro() {
                     this.libro.imagen = null;
-                    this.libro.categoria = null;
+                    this.categorias.forEach(element => {
+                        element.checked = false;
+                    });
                     this.libro.nombre = null;
                     this.libro.descripcion = null;
                 },
