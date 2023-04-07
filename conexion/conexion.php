@@ -5,6 +5,12 @@ class ApptivaDB {
     private $clave = "";
     private $db = "pedidossipueden";
     public $conexion;
+
+    // private $host = "localhost";
+    // private $usuario = "fundaci_pedidos";
+    // private $clave = "pedidos.1379";
+    // private $db = "fundaci_pedidos";
+    // public $conexion;
     
     public function __construct(){
         $this->conexion = new mysqli($this->host, $this->usuario, $this->clave, $this->db)
@@ -98,6 +104,20 @@ class ApptivaDB {
                 $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro' AND categoria LIKE '$condicion'") or die();
             }
             // return $fila = mysql_fetch_assoc($resultado);
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    public function contarRecursos($idCategoria) {
+        try {
+            if ($idCategoria == 0) {
+                $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'recurso'") or die();
+            } else {
+                $condicion = '%-' . $idCategoria . '-%';
+                $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'recurso' AND categoria LIKE '$condicion'") or die();
+            }
             return $resultado->fetch_all(MYSQLI_ASSOC);
         } catch (\Throwable $th) {
             return false;
