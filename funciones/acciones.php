@@ -455,6 +455,40 @@
 
         break;
 
+        case 'getPlanificaciones':
+            $idCategoria = $_POST["idCategoria"];
+            $inicio = $_POST["inicio"];
+
+            $u = $user -> consultarPlanificaciones("recursos", $idCategoria, $inicio);
+
+            if ($u || $u == []) { 
+                $res["archivos"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "Hubo un error al recuperar la información. Por favor recargue la página.";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'verPlanificacion':
+            $id = $_POST["idPlanificacion"];
+            $condicion = "id = '". $id . "'";
+
+            $u = $user -> verPlanificacion("recursos", $condicion);
+
+            if ($u || $u == []) { 
+                $res["archivos"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "Hubo un error al recuperar la información. Por favor recargue la página.";
+                $res["error"] = true;
+            } 
+
+        break;
+
         case 'getCategorias':
             $tipo = $_POST["recurso"];
             $condicion = "tipo = '". $tipo . "'";
@@ -502,6 +536,21 @@
 
         break;
 
+        case 'contarPlanificaciones':
+            $categoria = $_POST["categoria"];
+
+            $u = $user -> contarPlanificaciones($categoria);
+            if ($u || $u == []) { 
+                $res["cantidad"] = $u[0]["total"];
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "Hubo un error al recuperar la información. Actualice la página";
+                $res["error"] = true;
+            } 
+
+        break;
+
 
         case 'postCategoria':
             $tipo = $_POST["tipo"];
@@ -526,10 +575,10 @@
             $categoria = $_POST["categoria"];
             $descripcion = $_POST["descripcion"];
             $archivo = $_POST['archivo'];
-            
             $data = "'" . $tipo . "', '" . $nombre . "', '" . $categoria . "', '" . $descripcion . "', '" . $archivo . "'";
             
             $u = $user -> insertar("recursos", $data);
+            //echo $u;
         
             if ($u) {
                 $res["error"] = false;
@@ -577,11 +626,26 @@
 
             $u = $user -> eliminar("recursos", "id = ". $idRecurso);
             if ($u || $u == []) { 
-                // $res["recursos"] = $u;
+                $res["recursos"] = $u;
                 $res["mensaje"] = "El recurso se eliminó correctamente";
             } else {
-                // $res["u"] = $u;
+                $res["u"] = $u;
                 $res["mensaje"] = "No se pudo eliminar el recurso";
+                $res["error"] = true;
+            } 
+
+        break;
+
+        case 'eliminarPlanificacion':
+            $idRecurso = $_POST["idPlanificacion"];
+
+            $u = $user -> eliminar("recursos", "id = ". $idRecurso);
+            if ($u || $u == []) { 
+                $res["recursos"] = $u;
+                $res["mensaje"] = "La planificación se eliminó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "No se pudo eliminar la planificación";
                 $res["error"] = true;
             } 
 

@@ -5,12 +5,6 @@ class ApptivaDB {
     private $clave = "";
     private $db = "pedidossipueden";
     public $conexion;
-
-    // private $host = "localhost";
-    // private $usuario = "fundaci_pedidos";
-    // private $clave = "pedidos.1379";
-    // private $db = "fundaci_pedidos";
-    // public $conexion;
     
     public function __construct(){
         $this->conexion = new mysqli($this->host, $this->usuario, $this->clave, $this->db)
@@ -63,21 +57,38 @@ class ApptivaDB {
         try {
             if ($idCategoria == 0) {
                 $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' ORDER BY nombre limit 5 offset $inicio") or die();
-                // echo "SELECT * FROM $tabla WHERE tipo = '$tipo' ORDER BY nombre limit 10 off $inicio";
             } else {
                 $condicion = '%-' . $idCategoria . '-%';
-                // $resultado = $this->conexion->query("SELECT * FROM libros WHERE categoria = $idCategoria") or die();
                 $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' AND categoria LIKE '$condicion' ORDER BY nombre limit 5 offset $inicio") or die();
             }
-            // $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE $condicion ORDER BY nombre ASC limit 10 OFFSET 10") or die();
             return $resultado->fetch_all(MYSQLI_ASSOC);
         } catch (\Throwable $th) {
             return false;
         }
     }
 
+    public function consultarPlanificaciones($tabla, $idCategoria, $inicio) {
+        try {
+            if ($idCategoria == 0) {
+                $resultado = $this->conexion->query("SELECT id, nombre, categoria, descripcion FROM $tabla WHERE tipo = 'planificaciones' ORDER BY nombre limit 5 offset $inicio") or die();
+            } else {
+                $condicion = '%-' . $idCategoria . '-%';
+                $resultado = $this->conexion->query("SELECT id, nombre, categoria, descripcion FROM $tabla WHERE tipo = 'planificaciones' AND categoria LIKE '$condicion' ORDER BY nombre limit 5 offset $inicio") or die();
+            }
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
 
-
+    public function verPlanificacion($tabla, $condcion) {
+        try {
+            $resultado = $this->conexion->query("SELECT archivo FROM $tabla WHERE $condcion") or die();
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
 
     public function buscarPorCategoria($idCategoria) {
         try {
@@ -117,6 +128,20 @@ class ApptivaDB {
             } else {
                 $condicion = '%-' . $idCategoria . '-%';
                 $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'recurso' AND categoria LIKE '$condicion'") or die();
+            }
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    public function contarPlanificaciones($idCategoria) {
+        try {
+            if ($idCategoria == 0) {
+                $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'planificaciones'") or die();
+            } else {
+                $condicion = '%-' . $idCategoria . '-%';
+                $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'planificaciones' AND categoria LIKE '$condicion'") or die();
             }
             return $resultado->fetch_all(MYSQLI_ASSOC);
         } catch (\Throwable $th) {

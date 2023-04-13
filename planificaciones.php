@@ -73,6 +73,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     NUEVA PLANIFICACIÓN
                 </div>
 
+                <!-- accept="application/pdf,application/msword*"
+                                @change="processFile($event)" -->
                 <div class="row rowBotones d-flex justify-content-center">
                     <div class="col-sm-12 col-md-6 mt-3">
                         <div class="pr-3">
@@ -80,43 +82,46 @@ if(time() - $_SESSION['login_time'] >= 1000){
                             <input 
                                 class="form-control" 
                                 type="file" 
-                                accept="image/*"
                                 capture
-                                name="documento"
-                                ref="documento"
+                                name="archivo"
+                                ref="archivo"
                                 @change="processFile($event)"
+                                accept=".pdf, .jpg"
                                 id="seleccionArchivos" 
-                                value="libro.nombreImagen"
+                                value="planificacion.nombreArchivo"
                             >
                         </div>
                         <div class="mt-2">
-                            <label for="nombre">Categoria (*) <span class="errorLabel" v-if="errorCategoria">{{errorCategoria}}</span></label>
-                            <select class="form-control" @change="changeCategoria(event.target.value)" name="categoria" id="categoria" v-model="libro.categoria">
-                                <option v-for="categoria in categorias" v-bind:value="categoria.id" >{{categoria.nombre}}</option>
-                                <option value="crearCategoria">Crear categoria</option>
-                            </select>
+                            <label for="nombre">Categoria (*) 
+                            <span class="errorLabel" v-if="errorCategoria">{{errorCategoria}}</span></label>
                             <button type="button" class="btn botonSmall" @click="modal=true" data-toggle="modal" data-target="#ModalCategoria">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                 </svg> AGREGAR CATEGORIA
                             </button> 
+                            <div class="row my-3">
+                                <div class="col-6 categoria" v-for="categoria in categorias">
+                                    <input v-model="categoria.checked" type="checkbox" value="categoria.id">
+                                    {{categoria.nombre}}
+                                </div>
+                            </div>                            
                         </div>
                         <div class="mt-2">
                             <label for="nombre">Nombre (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
-                            <input class="form-control" autocomplete="off" maxlength="60" id="nombre" v-model="libro.nombre">
+                            <input class="form-control" autocomplete="off" maxlength="60" id="nombre" v-model="planificacion.nombre">
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-6 mt-3">
                         <div>
                             <label for="nombre">Descripción (*) <span class="errorLabel" v-if="errorDescripcion">{{errorDescripcion}}</span></label>
-                            <textarea class="form-control textareaDescripcion" maxlength="400" v-model="libro.descripcion"></textarea>
+                            <textarea class="form-control textareaDescripcion" maxlength="400" v-model="planificacion.descripcion"></textarea>
                         </div>
                     </div>
                 </div>                   
 
                 <div class="footerABM" v-if="!confirmPlanificacion">
-                    <button type="button" class="btn botonABM" @click="cancelarModalLibro">Cancelar</button>
-                    <button type="button" @click="crearLibro" class="btn botonABM">
+                    <button type="button" class="btn botonABM" @click="cancelarModalPlanificacion">Cancelar</button>
+                    <button type="button" @click="crearPlanificacion" class="btn botonABM">
                         Crear
                     </button>
                 </div>
@@ -126,7 +131,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         ¿Confirma la nueva planificación?
                     </div>
                     
-                    <button type="button" @click="confirmarLibro" class="btn boton" v-if="!creandoPlanificacion">
+                    <button type="button" @click="confirmarPlanificacion" class="btn boton" v-if="!creandoPlanificacion">
                         Confirmar
                     </button>
                     <button 
@@ -145,7 +150,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
             <!-- END ABM PLANIFICACIONES -->
 
             <div class="row rowBotones d-flex justify-content-between">     
-                <select class="form-control selectCategoria" @change="buscarPorCategoria(event.target.value)" v-model="categoriaBusqueda">
+                <select class="form-control selectCategoria" @change="page= 1, getPlanificaciones()" v-model="categoriaBusqueda">
                     <option value="0" >Todas las categorias</option>
                     <option v-for="categoria in categorias" v-bind:value="categoria.id" >{{categoria.nombre}}</option>
                 </select>
@@ -165,34 +170,58 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     <!-- END COMPONENTE LOADING BUSCANDO PLANIFICACIONES -->
 
                     <div v-if="planificaciones.length != 0" class="row contenedorPlanficaciones d-flex justify-content-around">
-                        <article class="col-12 col-lg-6" v-for="libro  in planificaciones">
+                        <article class="col-12" v-for="planificacion  in planificaciones">
                             <div class="row rowCard">
-                                <div class="col-6 col-md-4 p-0" :id="'libro' + libro.id" >
-                                    <div class="imgCard">
-                                        <img  :src="retornarImagen(libro)"/>
-                                      
-                                        <button type="button" class="btn botonSmallTrash" @click="eliminarLibro(libro.id, libro.nombre)" data-toggle="modal" data-target="#ModalCategoria" v-if="usuarioAdmin == 'admin'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                            </svg> ELIMINAR LIBRO
-                                        </button>
-
-                                      
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-8 p-0" :id="'descripcion' + libro.id" >
+                                <div class="col-12 col-sm-10 p-0" :id="'descripcion' + planificacion.id" >
                                     <div class="descripcionCard">
-                                        <div class="tituloLibro">{{libro.nombre}} 
-                                        <div class="descripcionLibro">
-                                            {{libro.descripcion}}
+                                        <div class="tituloPlanificacion">
+                                            {{planificacion.nombre}}
+                                        </div> 
+                                        <div class="descripcionPlanificacion">
+                                            {{planificacion.descripcion}}
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-12 col-sm-2 acciones" :id="'planificacion' + planificacion.id" >
+                                    <button type="button" class="btn botonSmallTrash" @click="eliminarPlanificacion(planificacion.id, planificacion.nombre)" data-toggle="modal" data-target="#ModalCategoria" v-if="usuarioAdmin == 'admin'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                    </button>
+
+                                    <button type="button" class="btn botonSmallEye" @click="verPlanificacion(planificacion.id)" data-toggle="modal" data-target="#ModalCategoria">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </article>
+                        <div class="row mt-3 mb-5 paginacion">
+                            <div class="col-4">
+                                <button @click="prev" class="btnPaginacion pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                                        <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="col-4 d-flex justify-content-center">
+                            {{page * 5 - 4}} a {{page * 5 > cantidadRecursos ? cantidadRecursos : page * 5}} de {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}}
+                            <!-- Página {{page}} de {{Math.ceil(cantidadRecursos/5)}} /    {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}} -->
+                            </div>
+                            <div class="col-4 d-flex justify-content-end">
+                                <button  class="btnPaginacion pointer" @click="next">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                                        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div> 
                     <div class="contenedorTabla" v-else>
+                        
                         <span class="sinResultados">
                             NO SE ENCONTRÓ RESULTADOS PARA MOSTRAR
                         </span>
@@ -218,7 +247,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                         <label for="nombre" class="labelCategoria">Nombre categoria(*)</label>
                                         <input class="inputCategoria" @input="errorNuevaCategoria = false"  v-model="nuevaCategoria">
                                     </div>
-                                    <span class="errorLabel" v-if="errorNuevaCategoria">Complete el campo para crear la/s categoria/s</span>
+                                    <span class="errorLabel" v-if="errorNuevaCategoria">Complete el campo para crear la categoria</span>
                                 </div>
                                 <select class="form-control verCategorias">
                                     <option value="0" style="color: light-grey" >VER CATEGORIAS CREADAS</option>
@@ -264,31 +293,32 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 </div>    
                 <!-- MODAL CATEGORIAS -->
 
-                <!-- MODAL ELIMINAR LIBRO -->
+                <!-- MODAL ELIMINAR PLANIFICACION -->
                 <div v-if="modalEliminar">
                     <div id="myModal" class="modal">
                         <div class="modal-content p-0">
                             <div class="modal-header  d-flex justify-content-center">
-                                <h5 class="modal-title" id="ModalLabel">ELIMINAR LIBRO</h5>
+                                <h5 class="modal-title" id="ModalLabel">ELIMINAR PLANIFICACIÓN</h5>
                             </div>
 
                             <div class="modal-body row d-flex justify-content-center">
                                 <div class="col-sm-12 mt-3 d-flex justify-content-center">
-                                    ¿Desea eliminar el libro {{libroEliminable.nombre}} ?
+                                    ¿Desea eliminar la planificacion: </br>
+                                     <b> {{ planificacionEliminable.nombre}}</b> ?
                                 </div>                                
                             </div>
 
 
                             <div class="modal-footer d-flex justify-content-between" v-if="!confirmCategorias">
-                                <button type="button" class="btn boton" @click="cancelarEliminarLibro" >Cancelar</button>
+                                <button type="button" class="btn boton" @click="cancelarEliminarPlanificacion" >Cancelar</button>
                                 
-                                <button type="button" @click="confirmarEliminarLibro" class="btn boton" v-if="!eliminandoLibro">
+                                <button type="button" @click="confirmarEliminarPlanificacion" class="btn boton" v-if="!eliminandoPlanificacion">
                                     Confirmar
                                 </button>
 
                                 <button 
                                     class="btn boton"
-                                    v-if="eliminandoLibro" 
+                                    v-if="eliminandoPlanificacion" 
                                 >
                                     <div class="loading">
                                         <div class="spinner-border" role="status">
@@ -330,7 +360,24 @@ if(time() - $_SESSION['login_time'] >= 1000){
         
     </div>
 
-    <style scoped>  
+    <style scoped>
+    .paginacion{
+            color: grey;
+            font-size: 14px;
+        }
+        .btnPaginacion{
+            border: none;
+            background: white;
+            color: #7C4599;
+        }     
+        .acciones{
+            display: flex;
+            align-items: end;
+            flex-direction: column;
+        }
+        .categoria{
+            font-size: 0.8em;
+        }
         .ir-arriba {
             background-color: #7C4599;;
             width: 35px;
@@ -414,26 +461,33 @@ if(time() - $_SESSION['login_time'] >= 1000){
             font-size: 13px;
             color: #7C4599;
         }
-        .botonSmallTrash{
+        .botonSmallEye{
+            width: 40px;
+            height: 30px;
+            border: solid 1px rgb(124, 69, 153);;
             font-size: 12px;
-            color: red;
+            color:rgb(124, 69, 153);
+            padding: 0;
+            margin: 5px 0;
+        }
+        .botonSmallEye:hover{
+            font-size: 13px;
+            background-color: rgb(124, 69, 153);
+            color: white;
+        }
+        .botonSmallTrash{
+            width: 40px;
+            height: 30px;
+            border: solid 1px rgb(238, 100, 100);
+            font-size: 12px;
+            color: rgb(238, 100, 100);
             padding: 0;
             margin: 5px 0;
         }
         .botonSmallTrash:hover{
             font-size: 13px;
-            color: red;
-        }
-        .botonSmallAgregado{
-            font-size: 13px;
-            color: green;
-            border: solid 1px green;
-        }
-        .botonSmallAgregado:hover{
-            font-size: 13px;
-            color: green;
-            border: solid 1px green;
-            cursor: auto
+            background-color: rgb(238, 100, 100);
+            color: white;
         }
         .textareaDescripcion{
             margin:0!important;
@@ -447,15 +501,15 @@ if(time() - $_SESSION['login_time'] >= 1000){
 
         /*  PLANIFICACIONES */
         article{
-            min-height:230px;
+            min-height:30px;
             margin: 10px 0px;
             padding: 0!important;
         }
         .rowCard{
             border-radius: 5px;
             border: solid 1px grey;
-            padding: 2px;
-            width: 99%;
+            width: 100%;
+            padding: 10px;
             height:100%;
             margin:auto;
         }
@@ -492,36 +546,19 @@ if(time() - $_SESSION['login_time'] >= 1000){
         .descripcionCard{
             padding: 0;
             display:flex;
-            min-height: 250px;
+            min-height: 40px;
             flex-direction: column;
             justify-content: start;
             align-items: start;
         }
-        .imgCard img{
-            width: 100%;
-            max-width: 150px;
-            max-height: 250px;
-            height: 100%;
-            margin: 0 !important;
-        }
-        .tituloLibro{
+        .tituloPlanificacion{
             font-size: 1em;
             margin-top:5px;
             text-transform: uppercase;
-            padding-left: 5px;
+            color:rgb(124, 69, 153);
         }
-        .descripcionLibro{
+        .descripcionPlanificacion{
             font-size: 0.9em;
-            padding-left: 5px;
-        }
-        .colImagen{
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .colImagen img{
-            height: 100%;
-            width: 100%;
         }
         .card-title{
             font-size: 1.3em;
@@ -544,7 +581,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
     
    
         .inputCategoria{
-            border: solid 1px rgb(124, 69, 153);;
+            border: solid 1px rgb(124, 69, 153);
             border-radius: 5px;
             height: 40px;
         }
@@ -592,6 +629,21 @@ if(time() - $_SESSION['login_time'] >= 1000){
             margin-top: 24px;
             width: 100%;
         }    
+        @media (max-width: 575px) {
+            .acciones{
+                display: flex;
+                justify-content: center;
+                flex-direction: row;
+            }
+            .botonSmallTrash{
+                width: 60px;
+                margin: 0 5px;
+            }
+            .botonSmallEye{
+                width: 60px;
+                margin: 0 5px;
+            }
+        }   
     </style>
     <script>
         var app = new Vue({
@@ -599,6 +651,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
             components: {                
             },
             data: {
+                page: 1,
                 modalPlanificaciones: false,
                 errorDocumento: null,
                 confirmPlanificacion: false,
@@ -606,6 +659,13 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 planificaciones: [],
                 creandoCategoria: false,
                 creandoPlanificacion: false,
+                planificacion: {
+                    nombre: null,
+                    archivo: null,
+                    nombreArchivo: null,
+                    descripcion: null,
+                    categoria: null
+                },
                 //
                 scroll: false,
                 showCategorias: false,
@@ -613,13 +673,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 textoToast: null,
                 buscandoCategorias: false,
                 categorias: [],
-                libro: {
-                    nombre: null,
-                    imagen: null,
-                    nombreImagen: null,
-                    descripcion: null,
-                    categoria: null
-                },
+                
                 errorCategoria: null,
                 errorNombre: null,
                 errorDescripcion: null,
@@ -629,11 +683,11 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 modal: false,
                 pdfbase64: null,
                 archivo: null,
-                libroEliminable: {
+                planificacionEliminable: {
                     nombre: null,
                     id: null
                 },
-                eliminandoLibro: false,
+                eliminandoPlanificacion: false,
                 modalEliminar: false,
                 //
                 loading: false,
@@ -641,43 +695,102 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 usuarioAdmin: false,
                 categoriaBusqueda: "0"
             },
-            computed: {
-                verArchivo() {
-                    return this.pdfbase64;
-                }
-            },
             mounted () {
                 this.usuarioAdmin = "<?php echo $rol; ?>";
-                this.getRecursos();
+                this.consultarCantidad();
+                this.getPlanificaciones();
                 this.getCategorias();
             },
             beforeUpdate(){
                 window.onscroll = function (){
                     // Obtenemos la posicion del scroll en pantall
                     var scroll = document.documentElement.scrollTop || document.body.scrollTop;
-
-                    // Realizamos alguna accion cuando el scroll este entre la posicion 300 y 400
-                    if(scroll > 300 && scroll < 400){
-                        console.log("Pasaste la posicion 300 del scroll");
-                    }
                 }
             },
             methods:{
-                getRecursos() {
+                consultarCantidad () {
+                    let categoria = this.categoriaBusqueda;
+                    let formdata = new FormData();
+                    formdata.append("categoria", this.categoriaBusqueda);
+
+                    axios.post("funciones/acciones.php?accion=contarPlanificaciones", formdata)
+                    .then(function(response){    
+                        if (response.data.error) {
+                            app.mostrarToast("Error", response.data.mensaje);
+                        } else {
+                            if (response.data.cantidad != false) {
+                                app.cantidadRecursos = response.data.cantidad
+                            } else {
+                                app.cantidadRecursos = 0;
+                            }
+                        }
+                    });
+                },
+                prev() {
+                    if(this.page > 1) {
+                        this.page = this.page - 1;
+                        this.getPlanificaciones();
+                    }
+                },
+                next() {
+                    if (Math.ceil(this.cantidadRecursos/5) > this.page) {
+                        this.page = this.page + 1;
+                        this.getPlanificaciones();
+                    }
+                },
+                getPlanificaciones() {
                     this.buscandoPlanificaciones = true;
                     let formdata = new FormData();
                     formdata.append("recurso", "planificaciones");
-                    axios.post("funciones/acciones.php?accion=getRecursos", formdata)
-                    .then(function(response){    
-                        console.log(response.data);
+                    formdata.append("idCategoria", this.categoriaBusqueda);
+                    if (this.page == 1) {
+                        formdata.append("inicio", 0);
+                    } else {
+                        formdata.append("inicio", ((app.page -1) * 5));
+                    }
+                    this.consultarCantidad()
+
+
+                    formdata.append("recurso", "planificaciones");
+                    axios.post("funciones/acciones.php?accion=getPlanificaciones", formdata)
+                    .then(function(response){ 
+                        console.log(response.data);   
                         app.buscandoPlanificaciones = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
-                            if (response.data.planificaciones) {
-                                app.planificaciones = response.data.planificaciones;
+                            if (response.data.archivos != false) {
+                                app.planificaciones = response.data.archivos;
+                            } else {
+                                app.planificaciones = []
                             }
                         }
+                    });
+                },
+                verPlanificacion(id) {
+                    let formdata = new FormData();
+                    formdata.append("idPlanificacion", id);
+                
+                    axios.post("funciones/acciones.php?accion=verPlanificacion", formdata)
+                    .then(function(response){    
+                        // app.buscandoPlanificaciones = false;
+                        if (response.data.error) {
+                            app.mostrarToast("Error", response.data.mensaje);
+                        } else {
+                            if (response.data.archivos != false) {
+                                try {
+                                    const blob = app.dataURItoBlob(response.data.archivos[0].archivo)
+                                    const url = URL.createObjectURL(blob)
+                                    window.open(url, '_blank');
+                                } catch (error) {
+                                    app.creandoCategoria = false;
+                                    app.mostrarToast("Error", "No se pudo visualizar el archivo. Intente nuevamente");
+                                }
+                            }
+                        }
+                    }).catch( error => {
+                        app.creandoCategoria = false;
+                        app.mostrarToast("Error", "No se pudo visualizar el archivo. Intente nuevamente");
                     });
                 },
                 getCategorias () {
@@ -686,7 +799,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     formdata.append("recurso", "planificaciones");
                     axios.post("funciones/acciones.php?accion=getCategorias", formdata)
                     .then(function(response){
-                        console.log(response.data);
                         app.buscandoCategorias = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
@@ -697,8 +809,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         }
                     })
                 },
-                //
-                //
                 //
                 crearCategoria () {
                     app.creandoCategoria = true;
@@ -725,102 +835,46 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     })
                 },
                 //
-                //
-                //
                 irAHome () {
                     window.location.href = 'home.php';    
                 },
                 irArriba () {
                     window.scrollTo(0, 0);   
                 },
-                eliminarLibro (id, nombre) {
-                    this.libroEliminable.id = id;
-                    this.libroEliminable.nombre = nombre;
+                //
+                //
+                //
+                //
+                //
+                //
+                // FUNCIONES A REUTILIZAR
+                eliminarPlanificacion (id, nombre) {
+                    this.planificacionEliminable.id = id;
+                    this.planificacionEliminable.nombre = nombre;
                     this.modalEliminar = true;
                 },
-                cancelarEliminarLibro () {
-                    this.libroEliminable.nombre = null;
-                    this.libroEliminable.id = null;
+                cancelarEliminarPlanificacion () {
+                    this.planificacionEliminable.nombre = null;
+                    this.planificacionEliminable.id = null;
                     this.modalEliminar = false;
                 },
-                confirmarEliminarLibro() {
-                    this.eliminandoLibro = true;
+                confirmarEliminarPlanificacion() {
+                    this.eliminandoPlanificacion = true;
                     let formdata = new FormData();
-                    formdata.append("idLibro", app.libroEliminable.id);
+                    formdata.append("idPlanificacion", app.planificacionEliminable.id);
 
-                    axios.post("funciones/acciones.php?accion=eliminarLibro", formdata)
+                    axios.post("funciones/acciones.php?accion=eliminarPlanificacion", formdata)
                     .then(function(response){    
-                        app.eliminandoLibro = false;
+                        app.eliminandoPlanificacion = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
                             app.modalEliminar = false;
                             app.mostrarToast("Éxito", response.data.mensaje);
-                            app.getRecursos(); 
+                            app.getPlanificaciones(); 
                         }
                     });
-                },
-                changeCategoria (param) {
-                    if (param == "crearCategoria") {
-                        this.modal = true
-                    } else {
-                        this.modal = false
-                    }
-                },
-                verDescripcion (id) {
-                    document.getElementById("libro"+id).classList.add("hide")
-                    document.getElementById("descripcion"+id).classList.remove("hide")
-                },
-                ocultarDescripcion (id) {
-                    document.getElementById("libro"+id).classList.remove("hide")
-                    document.getElementById("descripcion"+id).classList.add("hide")
-                },
-                subirImagen () {
-                    const $seleccionArchivos = document.querySelector("#seleccionArchivos"),
-                    $imagenPrevisualizacion = document.querySelector("#imagenPrevisualizacion");
-                    const archivos = $seleccionArchivos.files;
-                    // Si no hay archivos salimos de la función y quitamos la imagen
-                    if (!archivos || !archivos.length) {
-                        $imagenPrevisualizacion.src = "";
-                        return;
-                    }
-                    // Ahora tomamos el primer archivo, el cual vamos a previsualizar
-                    const primerArchivo = archivos[0];
-                    // Lo convertimos a un objeto de tipo objectURL
-                    const objectURL = URL.createObjectURL(primerArchivo);
-                 
-                    this.libro.imagen = objectURL
-                    // Y a la fuente de la imagen le ponemos el objectURL
-                    $imagenPrevisualizacion.src = objectURL;
-                },
-                retornarImagen(param){
-                    return param.imagen
-                },
-                buscarPorCategoria (param) {
-                    this.buscandoPlanificaciones = true;
-                    let formdata = new FormData();
-                    formdata.append("idCategoria", app.categoriaBusqueda);
-
-                    axios.post("funciones/acciones.php?accion=buscarPorCategoria", formdata)
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=buscarPorCategoria", formdata)
-                    .then(function(response){    
-                        app.buscandoPlanificaciones = false;
-                        if (response.data.error) {
-                            app.mostrarToast("Error", response.data.mensaje);
-                        } else {
-                            app.planificaciones = response.data.planificaciones;
-                            app.planificaciones.forEach(element => {
-                                if (element.imagen !== null) {
-                                    const blob = app.dataURItoBlob(element.imagen)
-                                    const url = URL.createObjectURL(blob)
-                                    element.imagen = url
-                                    // element.imagen = "img/"+ element.imagen
-                                }
-                            })
-                        }
-                    });
-                },
-             
+                },            
                 dataURItoBlob (dataURI) {
                     const byteString = window.atob(dataURI)
                     const arrayBuffer = new ArrayBuffer(byteString.length)
@@ -828,7 +882,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     for (let i = 0; i < byteString.length; i++) {
                         int8Array[i] = byteString.charCodeAt(i)
                     }
-                    const blob = new Blob([int8Array], {type: 'application/jpg'})
+                    const blob = new Blob([int8Array], {type: 'application/pdf'})
                     return blob
                 },
 
@@ -862,56 +916,58 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 
                 // END FUNCIONES CATEGORIA
 
-                // START MODAL LIBRO
+                // START MODAL PLANIFICACION
                 showABMPlanificacion (param) {
                     this.modalPlanificaciones = !param
                     if (param) {
-                        this.cancelarModalLibro()
+                        this.cancelarModalPlanificacion()
                     }
                 },
-                cancelarModalLibro () {
+                cancelarModalPlanificacion () {
                     this.modalPlanificaciones = false;
                     this.selectAnadir = 0;
-                    this.resetErroresNuevoLibro();
-                    this.resetNuevoLibro();
+                    this.resetErroresNuevaPlanificacion();
+                    this.resetNuevaPlanificacion();
                 },
                 processFile(event) {
-                    console.log(event.target.files[0])
+                    if (event.target.files[0].size > 999000) {
+                        this.errorDocumento = "Archivo muy grande"
+                        this.planificacion.archivo = null;
+                        return;
+                    }
                     if (event != undefined) {
                         this.archivo = event;
                         let reader = new FileReader();
                         try {
                             reader.readAsDataURL(event.target.files[0]);
                             reader.onload = () => {
-                                this.pdfbase64 = reader.result
+                                this.planificacion.archivo = reader.result
                                 .replace("data:", "")
                                 .replace(/^.+,/, "");
-                                console.log("termino");
                             }
                         } catch (e) {
                             this.mostrarToast("Error", "El archivo no se cargó correctamente");
                             return false;
                         }
                     }
-                    this.libro.nombreImagen = event.target.files[0].name
-                    this.subirImagen()
+                    this.planificacion.nombreArchivo = event.target.files[0].name
                 },  
-                crearLibro () {
+                crearPlanificacion () {
                     let error = false;
-                    this.resetErroresNuevoLibro();
-                    if (this.libro.imagen == null) {
+                    this.resetErroresNuevaPlanificacion();
+                    if (this.planificacion.archivo == null) {
                         this.errorDocumento = "Campo requerido";
                         error = true;
                     }
-                    if (this.libro.categoria == null || this.libro.categoria == "crearCategoria") {
+                    if (this.categorias.filter(element => element.checked).length == 0) {
                         this.errorCategoria = "Campo requerido";
                         error = true;
                     }
-                    if (this.libro.nombre == null || this.libro.nombre.trim() == '') {
+                    if (this.planificacion.nombre == null || this.planificacion.nombre.trim() == '') {
                         this.errorNombre = "Campo requerido";
                         error = true;
                     } 
-                    if (this.libro.descripcion == null || this.libro.descripcion.trim() == '') {
+                    if (this.planificacion.descripcion == null || this.planificacion.descripcion.trim() == '') {
                         this.errorDescripcion = "Campo requerido";
                         error = true;
                     } 
@@ -919,45 +975,57 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         this.confirmPlanificacion = true;
                     }
                 },
-                confirmarLibro () {
-                    app.creandoLibro = true;
+                confirmarPlanificacion () {
+                    app.creandoPlanificacion = true;
                     let formdata = new FormData();
-                    formdata.append("categoria", app.libro.categoria);
-                    formdata.append("imagen", app.libro.imagen);
-                    formdata.append("nombre", app.libro.nombre);
-                    formdata.append("descripcion", app.libro.descripcion);
-                    axios.post("funciones/acciones.php?accion=crearLibro", formdata)
-                    // axios.post("http://localhost/proyectos/pedidosSiPueden/funciones/acciones.php?accion=crearLibro", formdata)
+                    let categorias = "-";
+                    app.categorias.forEach(element => {
+                        if (element.checked) {
+                            categorias = categorias + element.id + "-"
+                        }    
+                    });
+
+                    let descripcion = app.planificacion.descripcion.replaceAll("'", '"')
+                    formdata.append("tipo", "planificaciones");
+                    formdata.append("categoria", categorias);
+                    formdata.append("archivo", app.planificacion.archivo);
+                    formdata.append("nombre", app.planificacion.nombre);
+                    // formdata.append("descripcion", app.planificacion.descripcion);
+                    formdata.append("descripcion", descripcion);
+
+                    axios.post("funciones/acciones.php?accion=crearRecurso", formdata)
                     .then(function(response){
-                        console.log(response.data);
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
                             app.modalPlanificaciones = false;
                             app.confirmPlanificacion = false;
+                            app.categorias.forEach(element => {
+                                element.checked = false;
+                            });
                             app.mostrarToast("Éxito", response.data.mensaje);
-                            app.getRecursos();
-                            app.resetNuevoLibro();
+                            app.getPlanificaciones();
+                            app.resetNuevaPlanificacion();
                         }
-                        app.creandoLibro = false;
+                        app.creandoPlanificacion = false;
                     }).catch( error => {
-                        app.creandoLibro = false;
-                        app.mostrarToast("Error", "No se pudo crear el libro");
+                        app.creandoPlanificacion = false;
+                        app.mostrarToast("Error", "No se pudo guardar la panificación");
                     })
                 },
-                resetErroresNuevoLibro() {
+                resetErroresNuevaPlanificacion() {
                     this.errorDocumento = null;
                     this.errorCategoria = null;
                     this.errorNombre = null;
                     this.errorDescripcion = null;
                 },
-                resetNuevoLibro() {
-                    this.libro.imagen = null;
-                    this.libro.categoria = null;
-                    this.libro.nombre = null;
-                    this.libro.descripcion = null;
+                resetNuevaPlanificacion() {
+                    this.planificacion.archivo = null;
+                    this.planificacion.categoria = null;
+                    this.planificacion.nombre = null;
+                    this.planificacion.descripcion = null;
                 },
-                // END FUNCIONES LIBRO
+                // END FUNCIONES PLANIFICACION
                 mostrarToast(titulo, texto) {
                     app.tituloToast = titulo;
                     app.textoToast = texto;
@@ -976,14 +1044,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         tituloToast.className = "errorModal";
                     }
                 },
-            },
-            watch: {
-                verArchivo () {
-                    if (this.pdfbase64) {
-                        this.libro.imagen = this.pdfbase64;
-                    }
-
-                }
             }
         })
         window.addEventListener('scroll', function(evt) {
