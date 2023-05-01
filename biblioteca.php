@@ -154,10 +154,27 @@ if(time() - $_SESSION['login_time'] >= 1000){
 
             <div class="row rowBotones d-flex justify-content-between">     
                 <select class="form-control selectCategoria" @change="page= 1, consultarLibros()" v-model="categoriaBusqueda">
-                <!-- <select class="form-control selectCategoria" @change="buscarPorCategoria(event.target.value)" v-model="categoriaBusqueda"> -->
                     <option value="0" >Todas las categorias</option>
                     <option v-for="categoria in categorias" v-bind:value="categoria.id" >{{categoria.nombre}}</option>
                 </select>
+
+                <div class="col-sm-12 col-md-6 px-0 mt-2 mt-md-0">
+                    <div class="row rowBuscador">
+                        <input class="form-control buscador" @keypress="changeBuscador(event)" :disabled="busquedaActiva" placeholder="Buscar libro" autocomplete="off" maxlength="60" id="buscador" v-model="buscador">
+                        <button type="button" @click="buscarLibro" class=" mx-2 btn boton" v-if="buscador.trim().length >= 3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>              
+                        </button>
+
+                        <button type="button" @click="borrarBusqueda" class="btn boton btnEliminarBusqueda" v-if="busquedaActiva">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>           
+                        </button>
+                    </div>
+                </div>
+                
             </div>
            
 
@@ -645,7 +662,16 @@ if(time() - $_SESSION['login_time'] >= 1000){
         /* ABM LIBROS */
 
 
-
+        .btnEliminarBusqueda{
+            color: rgb(238, 100, 100);;
+            border: solid 1px rgb(238, 100, 100);;
+        }
+        .btnEliminarBusqueda:hover{
+            background-color: rgb(238, 100, 100);;
+            color: white;
+            border: solid 1px rgb(238, 100, 100);
+            box-shadow: none;
+        }
         /*  LIBROS */
         article{
             min-height:230px;
@@ -792,7 +818,14 @@ if(time() - $_SESSION['login_time'] >= 1000){
             padding: 10xp;
             margin-top: 24px;
             width: 100%;
-        }    
+        }   
+        .buscador{
+            width: 60% !important;
+        }
+        .rowBuscador{
+            width: 100%;
+            margin: auto;
+        }
     </style>
     <script>
         var app = new Vue({
@@ -894,7 +927,9 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 enviarCopia: false,
                 usuarioAdmin: false,
                 categoriaBusqueda: "0",
-                librosPedidos: []
+                librosPedidos: [],
+                buscador: "",
+                busquedaActiva: false
             },
             computed: {
                 verArchivo() {
@@ -932,6 +967,11 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 }
             },
             methods:{
+                changeBuscador (param) {
+                    if (param.key == "Enter" && this.buscador.length >= 3) {
+                        this.buscarLibro()
+                    }
+                },
                 mostrarCarrito() {
                     this.verCarrito = true;
                     this.irArriba();
@@ -1028,6 +1068,15 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         }
                     })
                 },
+                buscarLibro() {
+                    this.busquedaActiva = true;
+                    this.consultarLibros();
+                },
+                borrarBusqueda () {
+                    this.busquedaActiva = false;
+                    this.buscador = "";
+                    this.consultarLibros();
+                },
                 buscarPorCategoria (param) {
                     this.buscandoLibros = true;
                     let formdata = new FormData();
@@ -1059,6 +1108,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     let categoria = this.categoriaBusqueda;
                     let formdata = new FormData();
                     formdata.append("categoria", this.categoriaBusqueda);
+                    formdata.append("buscador", this.buscador);
 
                     axios.post("funciones/acciones.php?accion=contarLibros", formdata)
                     .then(function(response){    
@@ -1085,11 +1135,46 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         this.consultarLibros();
                     }
                 },
+                // consultarLibros() {
+                //     this.buscandoLibros = true;
+                //     let formdata = new FormData();
+                //     formdata.append("recurso", "libro");
+                //     formdata.append("idCategoria", this.categoriaBusqueda);
+                //     if (this.page == 1) {
+                //         formdata.append("inicio", 0);
+                //     } else {
+                //         formdata.append("inicio", ((app.page -1) * 5));
+                //     }
+                //     this.consultarCantidad()
+
+                //     axios.post("funciones/acciones.php?accion=getRecursos", formdata)
+                //     .then(function(response){    
+                //         app.buscandoLibros = false;
+                //         if (response.data.error) {
+                //             app.mostrarToast("Error", response.data.mensaje);
+                //         } else {
+                //             if (response.data.archivos != false) {
+                //                 app.libros = response.data.archivos;
+                //                 // console.log(app.libros);
+                //                 app.libros.forEach(element => {
+                //                     if (element.archivo !== null) {
+                //                         const blob = app.dataURItoBlob(element.archivo)
+                //                         const url = URL.createObjectURL(blob)
+                //                         element.archivo = url
+                //                     }
+                //                 })
+                //             } else {
+                //                 app.libros = []
+                //             }
+                //         }
+                //     });
+                // },
                 consultarLibros() {
                     this.buscandoLibros = true;
                     let formdata = new FormData();
                     formdata.append("recurso", "libro");
                     formdata.append("idCategoria", this.categoriaBusqueda);
+                    formdata.append("buscador", this.buscador);
                     if (this.page == 1) {
                         formdata.append("inicio", 0);
                     } else {
@@ -1097,13 +1182,15 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     }
                     this.consultarCantidad()
 
-                    axios.post("funciones/acciones.php?accion=getRecursos", formdata)
+                    axios.post("funciones/acciones.php?accion=getLibros", formdata)
                     .then(function(response){    
+                        console.log(response.data);
                         app.buscandoLibros = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
                         } else {
                             if (response.data.archivos != false) {
+                                
                                 app.libros = response.data.archivos;
                                 // console.log(app.libros);
                                 app.libros.forEach(element => {

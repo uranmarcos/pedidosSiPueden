@@ -67,6 +67,64 @@ class ApptivaDB {
         }
     }
 
+    public function consultarLibros($tabla, $tipo, $idCategoria, $buscador, $inicio) {
+        try {
+            if ($buscador != "") {
+                $busqueda = '%' . $buscador . '%';
+                if ($idCategoria == 0) {
+                    $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' AND nombre LIKE '$busqueda' ORDER BY nombre limit 5 offset $inicio") or die();
+                } else {
+                    $condicion = '%-' . $idCategoria . '-%';
+                    $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' AND categoria LIKE '$condicion' AND nombre LIKE '$busqueda' ORDER BY nombre limit 5 offset $inicio") or die();
+                }
+            } else {
+                if ($idCategoria == 0) {
+                    $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' ORDER BY nombre limit 5 offset $inicio") or die();
+                } else {
+                    $condicion = '%-' . $idCategoria . '-%';
+                    $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' AND categoria LIKE '$condicion' ORDER BY nombre limit 5 offset $inicio") or die();
+                }
+            }
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    public function contarLibros($idCategoria, $buscador) {
+        try {
+            if ($buscador != "") {
+                $busqueda = '%' . $buscador . '%';
+                if ($idCategoria == 0) {
+                    // $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' AND nombre LIKE '$busqueda' ORDER BY nombre limit 5 offset $inicio") or die();
+                    $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro' AND nombre LIKE '$busqueda'") or die();
+                } else {
+                    $condicion = '%-' . $idCategoria . '-%';
+                    // $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE tipo = '$tipo' AND categoria LIKE '$condicion' AND nombre LIKE '$busqueda' ORDER BY nombre limit 5 offset $inicio") or die();
+                    $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro' AND categoria AND nombre LIKE '$busqueda' LIKE '$condicion'") or die();
+                }
+            } else {
+                if ($idCategoria == 0) {
+                    $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro'") or die();
+                } else {
+                    $condicion = '%-' . $idCategoria . '-%';
+                    $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro' AND categoria LIKE '$condicion'") or die();
+                }
+            }
+
+
+            // if ($idCategoria == 0) {
+            //     $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro'") or die();
+            // } else {
+            //     $condicion = '%-' . $idCategoria . '-%';
+            //     $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro' AND categoria LIKE '$condicion'") or die();
+            // }
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
     public function consultarPlanificaciones($tabla, $idCategoria, $inicio) {
         try {
             if ($idCategoria == 0) {
@@ -99,22 +157,6 @@ class ApptivaDB {
                 // $resultado = $this->conexion->query("SELECT * FROM libros WHERE categoria = $idCategoria") or die();
                 $resultado = $this->conexion->query("SELECT * FROM recursos WHERE tipo = 'libro' AND categoria LIKE '$condicion'") or die();
             }
-            return $resultado->fetch_all(MYSQLI_ASSOC);
-        } catch (\Throwable $th) {
-            return false;
-        }
-    }
-
-    public function contarLibros($idCategoria) {
-        try {
-            if ($idCategoria == 0) {
-                $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro'") or die();
-            } else {
-                $condicion = '%-' . $idCategoria . '-%';
-                // $resultado = $this->conexion->query("SELECT * FROM libros WHERE categoria = $idCategoria") or die();
-                $resultado = $this->conexion->query("SELECT COUNT(*) total FROM recursos WHERE tipo = 'libro' AND categoria LIKE '$condicion'") or die();
-            }
-            // return $fila = mysql_fetch_assoc($resultado);
             return $resultado->fetch_all(MYSQLI_ASSOC);
         } catch (\Throwable $th) {
             return false;

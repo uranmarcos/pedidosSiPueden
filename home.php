@@ -32,30 +32,30 @@ if (!$_SESSION["login"] ) {
         
         <div class="container containerMenu">
             <div class="row mt-6">
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
-                <div class="opciones" @click="irA('materiales')">
-                    Pedido de <br>materiales
+                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                    <div class="opciones" @click="irA('materiales')">
+                        Pedido de <br>materiales
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
-                <div class="opciones" @click="irA('biblioteca')">
+                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                    <div class="opciones" @click="irA('biblioteca')">
                     
-                    Biblioteca
+                        Biblioteca
         
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
-                <div class="opciones"  @click="irA('planificaciones')">
-                    Banco de planificaciones
+                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                    <div class="opciones"  @click="irA('planificaciones')">
+                        Banco de planificaciones
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('recursos')">
-                <div class="opciones">
-                    Otros recursos
+                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('recursos')">
+                    <div class="opciones">
+                        Otros recursos
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </div>
     </div>
 
     <style scoped>

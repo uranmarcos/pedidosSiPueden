@@ -326,9 +326,9 @@
 
             $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedido . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
             // local:
-            $u = $user -> insertar("pedidos", $data);
+            // $u = $user -> insertar("pedidos", $data);
             // prod
-            // $u = $user -> insertar("sipueden", $data);
+            $u = $user -> insertar("sipueden", $data);
          
             if ($u == false) { 
                 $res["mensaje"] = "El pedido no pudo realizarse";
@@ -455,6 +455,28 @@
 
         break;
 
+        case 'getLibros':
+            $tipo = $_POST["recurso"];
+            $idCategoria = $_POST["idCategoria"];
+            $buscador = $_POST["buscador"];
+            $inicio = $_POST["inicio"];
+            $condicion = "tipo = '". $tipo . "'";
+            
+            $u = $user -> consultarLibros("recursos", $tipo, $idCategoria, $buscador, $inicio);
+
+
+
+            if ($u || $u == []) { 
+                $res["archivos"] = $u;
+                $res["mensaje"] = "La consulta se realizó correctamente";
+            } else {
+                $res["u"] = $u;
+                $res["mensaje"] = "Hubo un error al recuperar la información. Por favor recargue la página.";
+                $res["error"] = true;
+            } 
+
+        break;
+
         case 'getPlanificaciones':
             $idCategoria = $_POST["idCategoria"];
             $inicio = $_POST["inicio"];
@@ -508,8 +530,9 @@
 
         case 'contarLibros':
             $categoria = $_POST["categoria"];
+            $buscador = $_POST["buscador"];
 
-            $u = $user -> contarLibros($categoria);
+            $u = $user -> contarLibros($categoria, $buscador);
             if ($u || $u == []) { 
                 $res["cantidad"] = $u[0]["total"];
                 $res["mensaje"] = "La consulta se realizó correctamente";
