@@ -1342,7 +1342,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     let formdata = new FormData();
                     const tiempoTranscurrido = Date.now();
                     const hoy = new Date(tiempoTranscurrido);
-                    let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getYear();
+                    let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getFullYear();
 
                     formdata.append("nombreSiPueden", this.envio.nombre);
                     formdata.append("nombreVoluntario", this.envio.nombreVoluntario);
