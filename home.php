@@ -32,15 +32,23 @@ if (!$_SESSION["login"] ) {
         
         <div class="container containerMenu">
             <div class="row mt-6">
-                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
                     <div class="opciones" @click="irA('materiales')">
                         Pedido de <br>materiales
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
                     <div class="opciones" @click="irA('biblioteca')">
                     
                         Biblioteca
+        
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                    <div class="opciones" @click="irA('merienda')">
+                    
+                        Desayuno /
+                        <br>Merienda
         
                     </div>
                 </div>
@@ -125,6 +133,10 @@ if (!$_SESSION["login"] ) {
 
                         case "recursos":
                             window.location.href = 'recursos.php';         
+                            break;
+
+                        case "merienda":
+                            window.location.href = 'meriendas.php';         
                             break;
 
                         default:

@@ -304,6 +304,138 @@
 
         break;
 
+        case 'enviarPedidoMeriendas':
+            require("pdf.php");
+          
+            $nombreSiPueden     = $_POST["nombreSiPueden"]; 
+            $nombreVoluntario   = $_POST["nombreVoluntario"]; 
+            $direccionEnvio     = $_POST["direccionEnvio"]; 
+            $ciudad             = $_POST["ciudad"];  
+            $provincia          = $_POST["provincia"]; 
+            $codigoPostal       = $_POST["codigoPostal"];
+            $telefono           = $_POST["telefono"];
+            $fecha              = $_POST["fecha"];
+            $mail               = $_POST["mail"];
+            $mailCopia          = $_POST["mailCopia"];
+            $pedido             = $_POST["pedido"];
+            $pedidoTabla        = explode(';', $pedido);
+            $pedidoVacio        = [];
+
+            date_default_timezone_set('America/Argentina/Cordoba');
+            $date = date("Y-m-d H:i:s");
+
+            $data = "'" . $date . "', '" . $direccionEnvio . "', '" . $ciudad . "', '" . $provincia . "', '" . $codigoPostal . "', '" . $telefono . "', '" . $pedido . "', '" . $nombreVoluntario . "', '" . $nombreSiPueden . "'";
+            // local:
+            // $u = $user -> insertar("pedidos", $data);
+            // prod
+            $u = $user -> insertar("sipueden", $data);
+         
+            if ($u == false) { 
+                $res["mensaje"] = "El pedido no pudo realizarse";
+                $res["error"] = true;
+                          
+            } else {   
+    
+                try {
+                    $pdf = new PDF();
+                    $pdf->AliasNbPages();
+                    $header = array('Listado de articulos pedidos');
+                    $pdf->AddPage();
+                    $pdf->SetFont('Arial','B',10);
+                    $pdf->Cell(0,10,$fecha,0,1,'R');
+                    $pdf->SetFont('Arial','B',12);
+                    $pdf->Cell(0,5,"Nuevo pedido de " . utf8_decode($nombreSiPueden),0,1,'C');
+                    
+                    $pdf->Ln();
+                    $pdf->SetFont('Arial','B',11);
+                    $pdf->SetTextColor(255,255,255);
+                    $pdf->Cell(0,10,'Datos de envio: ',0,1, 'L', true);
+                    $pdf->SetTextColor(0,0,0);
+                    $pdf->SetFont('Arial','',10);
+                    $pdf->Cell(0,10, utf8_decode("Voluntario: ") . utf8_decode($nombreVoluntario), 0,1);
+                    $pdf->Cell(0,10, utf8_decode("Dirección: ") . utf8_decode($direccionEnvio) . ", " . utf8_decode($ciudad) . ", " . utf8_decode($provincia), 0,1);
+                   
+                    $pdf->Cell(0,10, utf8_decode('Código postal: ') . utf8_decode($codigoPostal),0,1);
+                    $pdf->Cell(0,10, utf8_decode('Teléfono: ') . utf8_decode($telefono),0,1);
+                    $pdf->Ln();
+                    $pdf->SetFont('Arial','B',11);
+                    $pdf->SetTextColor(255,255,255);
+                    $pdf->Cell(0,10,'Articulos pedidos: ',0,1, 'L', true);
+                    $pdf->SetTextColor(0,0,0);
+                    $pdf->SetFont('Arial','',10);
+                    $pdf->TablaSimple($header, $pedidoVacio);
+    
+                    foreach ($pedidoTabla as $key => $value) {
+                        $pdf->SetFont('Arial','',10);
+                        $pdf->Cell(0,10, utf8_decode($value),1,1);
+                    }
+                    
+                    $pdf->Ln();
+
+                    $archivoPdf = $pdf->Output('','S');                  
+    
+                    $email_user = "pedidosresidencias@hotmail.com";
+                    $email_password = "pedidos.1379";
+    
+                    $the_subject = "Nuevo pedido de " . utf8_decode($nombreSiPueden);
+                    $address_to = $mail;
+                    $from_name = "Si Pueden";
+                    $phpmailer = new PHPMailer();
+                    // ———- datos de la cuenta de Gmail ——————————-
+                    $phpmailer->Username = $email_user;
+                    $phpmailer->Password = $email_password; 
+                    
+                    $phpmailer->Host = "smtp.office365.com"; // GMail
+                    $phpmailer->SMTPSecure = 'STARTTLS';
+                    
+                    $phpmailer->Port = 587;
+                    $phpmailer->IsSMTP(); // use SMTP
+                    $phpmailer->SMTPAuth = true;
+                    $phpmailer->setFrom($phpmailer->Username,$from_name);
+                    $phpmailer->AddAddress($address_to); // recipients email
+                    if ($mailCopia) {
+                        $phpmailer->AddBCC($mail);
+                        $address_to = $mailCopia;
+                    }
+                    $phpmailer->Subject = $the_subject;	
+    
+                    $phpmailer->Body .="<p>Nuevo pedido de </p>" . utf8_decode($nombreSiPueden) . " - ";
+                    $phpmailer->Body .= utf8_decode($ciudad) . ", " . utf8_decode($provincia);
+                    $phpmailer->Body .= "<p>Fecha: " . $fecha ."</p>";
+                    $phpmailer->IsHTML(true);
+                    $phpmailer->AddStringAttachment($archivoPdf, utf8_decode($nombreSiPueden) . '.pdf','base64');
+                    try {
+                        $phpmailer->smtpConnect([
+                            'ssl' => [
+                                'verify_peer' => false,
+                                'verify_peer_name' => false,
+                                'allow_self_signed' => true
+                            ]
+                        ]);
+                        $mensaje = "Pedido enviado correctamente";
+                        $res["mensaje"] = $mensaje;
+                        $res["error"] = false;
+                    } catch (\Throwable $th) {
+                        $mensaje = "El pedido no se pudo enviar. Intente nuevamente";
+                        $res["mensaje"] = $mensaje;
+                        $res["error"] = true;
+                        die;
+                    }
+                    if(!$phpmailer->send()) { 
+                        $mensaje = "El pedido no se pudo enviar. Intente nuevamente";
+                        $res["mensaje"] = $mensaje;
+                        $res["error"] = true;
+                        die;
+                    }
+                } catch (\Throwable $th) {
+                    $mensaje = "Hubo un error al enviar el pedido. Intente nuevamente";
+                    $res["mensaje"] = $mensaje;
+                    $res["error"] = true;
+                }
+            }
+
+        break;
+
         case 'enviarPedidoRecursos':
             require("pdf.php");
           
