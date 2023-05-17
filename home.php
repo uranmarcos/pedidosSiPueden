@@ -52,14 +52,19 @@ if (!$_SESSION["login"] ) {
         
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center">
                     <div class="opciones"  @click="irA('planificaciones')">
                         Banco de planificaciones
                     </div>
                 </div>
-                <div class="col-md-6 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('recursos')">
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('recursos')">
                     <div class="opciones">
                         Otros recursos
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('pedidos')" v-if="rol =='admin'">
+                    <div class="opciones">
+                        Pedidos <br>realizados
                     </div>
                 </div>
             </div>
@@ -114,7 +119,12 @@ if (!$_SESSION["login"] ) {
                     { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
                     { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
                     { age: 38, first_name: 'Jami', last_name: 'Carney' }
-                ]
+                ],
+                rol: ""
+            },
+            mounted() {
+                this.rol = "<?php echo $_SESSION["rol"]; ?>";
+                console.log(this.rol);
             },
             methods:{
                 irA(param) {
@@ -137,6 +147,10 @@ if (!$_SESSION["login"] ) {
 
                         case "merienda":
                             window.location.href = 'meriendas.php';         
+                            break;
+
+                        case "pedidos":
+                            window.location.href = 'pedidos.php';         
                             break;
 
                         default:

@@ -191,6 +191,28 @@ class ApptivaDB {
         }
     }
 
+    public function getPedidos() {
+        try {
+            //$resultado = $this->conexion->query("SELECT id, voluntario, merendero, provincia, fecha FROM pedidos ORDER BY fecha DESC limit 30") or die();
+            $resultado = $this->conexion->query("SELECT id, voluntario, merendero, provincia, fecha FROM sipueden WHERE STR_TO_DATE(fecha,'%Y-%m-%d %T')
+            BETWEEN DATE_SUB(CURDATE(), INTERVAL 60 DAY) 
+            AND CURDATE() ORDER BY fecha DESC ") or die();
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    public function verPedido($id) {
+        try {
+            $resultado = $this->conexion->query("SELECT fecha, direccion, ciudad, provincia,
+            codigoPostal, telefono, pedido, voluntario, merendero FROM sipueden WHERE id = '$id'") or die();
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
 }
 
 ?>

@@ -318,6 +318,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 </div>
                             </div>
                         </article>
+                    </div> 
+                    <div v-if="libros.length != 0 && !buscandoLibros" class="row contenedorLibros d-flex justify-content-around">
                         <div class="row mt-3 mb-5 paginacion">
                             <div class="col-4">
                                 <button @click="prev" class="btnPaginacion pointer">
@@ -327,8 +329,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 </button>
                             </div>
                             <div class="col-4 d-flex justify-content-center">
-                            {{page * 5 - 4}} a {{page * 5 > cantidadRecursos ? cantidadRecursos : page * 5}} de {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}}
-                            <!-- Página {{page}} de {{Math.ceil(cantidadRecursos/5)}} /    {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}} -->
+                                {{page * 5 - 4}} a {{page * 5 > cantidadRecursos ? cantidadRecursos : page * 5}} de {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}}
+                                <!-- Página {{page}} de {{Math.ceil(cantidadRecursos/5)}} /    {{cantidadRecursos == 1 ? "1 resultado" : cantidadRecursos >= 2 ? cantidadRecursos + " resultados" : ""}} -->
                             </div>
                             <div class="col-4 d-flex justify-content-end">
                                 <button  class="btnPaginacion pointer" @click="next">
@@ -338,7 +340,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 </button>
                             </div>
                         </div>
-                    </div> 
+</div>
 
                     <div class="contenedorTabla" v-if="libros.length == 0 && !buscandoLibros">
                         <span class="sinResultados">
@@ -1340,9 +1342,9 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     }
                     this.loading= true;
                     let formdata = new FormData();
-                    const tiempoTranscurrido = Date.now();
-                    const hoy = new Date(tiempoTranscurrido);
-                    let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getFullYear();
+                        const tiempoTranscurrido = Date.now();
+                        const hoy = new Date(tiempoTranscurrido);
+                        let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getFullYear();
 
                     formdata.append("nombreSiPueden", this.envio.nombre);
                     formdata.append("nombreVoluntario", this.envio.nombreVoluntario);

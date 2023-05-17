@@ -361,7 +361,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
     </div>
 
     <style scoped>
-    .paginacion{
+        .paginacion{
             color: grey;
             font-size: 14px;
         }
