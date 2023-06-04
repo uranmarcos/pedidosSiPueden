@@ -5,12 +5,15 @@ if (!$_SESSION["login"]) {
     header("Location: index.html");
 }
 
-if ($_SESSION["rol"] != "admin") {
+if ($_SESSION["rol"] != "admin" && $_SESSION["rol"] != "superAdmin") {
     header("Location: home.php");
 }
 
 if ($_SESSION["rol"] == "admin" ) {
     $rol = "admin";
+}
+if ($_SESSION["rol"] == "superAdmin" ) {
+    $rol = "superAdmin";
 }
 if(time() - $_SESSION['login_time'] >= 1000){
     session_destroy(); // destroy session.
@@ -39,6 +42,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
     <link href="css/home.css" rel="stylesheet"> 
     <link href="css/notificacion.css" rel="stylesheet"> 
     <link href="css/modal.css" rel="stylesheet"> 
+    <script src="funciones/pdf.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
@@ -48,13 +52,33 @@ if(time() - $_SESSION['login_time'] >= 1000){
             <!-- START BREADCRUMB -->
             <div class="col-12 p-0">
                 <div class="breadcrumb">
-                    <span class="pointer mr-2" @click="irAHome()">Inicio</span>  -  <span class="ml-2 grey"> Pedidos realizados </span>
+                    <span class="pointer mx-2" @click="irAHome()">Inicio</span>  -  <span class="mx-2 grey"> Pedidos realizados </span>
                 </div>
             </div>
             <!-- END BREADCRUMB -->
            
 
             <div class="row mt-6">
+                <!-- START BREADCRUMB -->
+                <div class="col-12 px-3" v-if="rol == 'superAdmin'">
+                    <div v-if="consultandoLimpieza" class="limpiezaPedidos">
+                        Verificando si existen pedidos para eliminar...
+                    </div>
+                    <div v-else class="atencionLimpieza">
+                        <div  class="atencionLimpieza px-2">
+                            {{pedidosALimpiar}} pedidos para limpiar  
+                            <button 
+                                type="button" 
+                                class="botonLimpiar" 
+                                @click="limpiarPedidos" 
+                                v-if="pedidosALimpiar != 0"
+                            >
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- END BREADCRUMB -->
                 <div class="col-12">
                     <!-- START COMPONENTE LOADING BUSCANDO pedidos -->
                     <div class="contenedorLoading" v-if="buscandoPedidos">
@@ -64,6 +88,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                             </div>
                         </div>
                     </div>
+                    
                     <!-- END COMPONENTE LOADING BUSCANDO pedidos -->
                     <div v-else>
                         <div v-if="pedidos.length != 0" class="row contenedorPlanficaciones d-flex justify-content-around">
@@ -76,6 +101,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                         <th scope="col">Merendero</th>
                                         <th scope="col">Provincia</th>
                                         <th scope="col">Fecha</th>
+                                        <th scope="col">Tipo</th>
                                         <th scope="col">Ver</th>
                                     </tr>
                                 </thead>
@@ -87,16 +113,18 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                             <td>{{pedido.merendero}}</td>
                                             <td>{{pedido.provincia}}</td>
                                             <td>{{formatearFecha(pedido.fecha)}}</td>
+                                            <td>{{pedido.destino}}</td>
                                             <td class="py-0">
-                                                <form method="POST" action="funciones/armarPdf.php" target="_blank">
-                                                    <input type="text" style="border: none" name="id" class="hide" readonly v-bind:value="pedido.id"> 
-                                                    <button type="submit" class="btn botonSmallEye">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-                                                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                                                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                                                        </svg>
-                                                    </button>
-                                                </form>
+                                                <button 
+                                                    type="button" 
+                                                    class="btn botonSmallEye" 
+                                                    @click="verPedido(pedido.id)" 
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                                    </svg>
+                                                </button>
                                             </td>
                                         </tr>
                                     </div>
@@ -115,7 +143,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 
                           
                 <!-- NOTIFICACION -->
-                <div role="alert" id="mitoast" aria-live="assertive" aria-atomic="true" class="toast">
+                <div role="alert" id="mitoast" aria-live="assertive" @mouseover="ocultarToast" aria-atomic="true" class="toast">
                     <div class="toast-header">
                         <!-- Nombre de la Aplicación -->
                         <div class="row tituloToast" id="tituloToast">
@@ -141,6 +169,24 @@ if(time() - $_SESSION['login_time'] >= 1000){
     </div>
 
     <style scoped>
+        .limpiezaPedidos{
+            color: grey;
+            font-size: 12px;
+        }
+        .atencionLimpieza{
+            color: rgb(238, 100, 100);
+            font-size: 13px;
+        }
+        .botonLimpiar{
+            height: 25px;
+            color: rgb(238, 100, 100);
+            border: solid 1px rgb(238, 100, 100);
+            background: white;
+        }
+        .botonLimpiar:hover{
+            color: white;
+            background: rgb(238, 100, 100);
+        }
         .categoria{
             font-size: 0.8em;
         }
@@ -237,9 +283,17 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 scroll: false,
                 tituloToast: null,
                 textoToast: null,
+                rol : null,
+                pedidosALimpiar: null,
+                consultandoLimpieza: false
+
             },
             mounted () {
                 this.getPedidos();
+                this.rol = "<?php echo $rol; ?>";
+                if (this.rol == 'superAdmin'){
+                    this.existenPedidosParaEliminar();
+                }
             },
             beforeUpdate(){
                 window.onscroll = function (){
@@ -254,7 +308,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
 
                     axios.post("funciones/acciones.php?accion=getPedidos", formdata)
                     .then(function(response){ 
-                        console.log(response.data);
                         app.buscandoPedidos = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
@@ -267,12 +320,181 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         }
                     });
                 },
+                existenPedidosParaEliminar () {
+                    this.consultandoLimpieza = true;
+                    axios.post("funciones/acciones.php?accion=consultandoLimpieza")
+                    .then(function(response){ 
+                        console.log(response.data);
+                        app.consultandoLimpieza = false;
+                        if (response.data.error) {
+                            app.mostrarToast("Error", response.data.mensaje);
+                        } else {
+                            app.pedidosALimpiar = response.data.cantidad;
+                            // if (response.data.cantidad != false) {
+                            // } else {
+                            //     app.pedidos = null
+                            // }
+                        }
+                    });
+                },
+                limpiarPedidos () {
+                    this.limpiandoPedidos = true;
+                    axios.post("funciones/acciones.php?accion=limpiarPedidos")
+                    .then(function(response){ 
+                        console.log(response.data);
+                        app.limpiandoPedidos = false;
+                        if (response.data.error) {
+                            app.mostrarToast("Error", response.data.mensaje);
+                        } else {
+                            app.mostrarToast("Éxito", "La limpieza se realizó correctamente");
+                            app.existenPedidosParaEliminar();
+                        }
+                    });
+                },
+                verPedido(id) {
+                    let formdata = new FormData();
+                    formdata.append("idPedido", id);
+                
+                    axios.post("funciones/acciones.php?accion=verPedido", formdata)
+                    .then(function(response){  
+                        if (response.data.error) {
+                            app.mostrarToast("Error", response.data.mensaje);
+                        } else {
+                            if (response.data.pedido != false) {
+                                app.armarPdf(response.data.pedido[0])
+                            }
+                        }
+                    }).catch( error => {
+                        app.mostrarToast("Error", "No se pudo visualizar el archivo. Intente nuevamente");
+                    });
+                },
+                armarPdf(pedido){
+                    pedido.pedido = pedido.pedido.replaceAll("**", "'")
+                    let fecha = this.formatearFecha(pedido.fecha);
+                    let merendero = pedido.merendero;
+                    let voluntario = pedido.voluntario;
+                    let direccion = pedido.direccion;
+                    let ciudad = pedido.ciudad;
+                    let provincia = pedido.provincia;
+                    let codigoPostal = pedido.codigoPostal;
+                    let telefono = pedido.telefono;
+                    let destino = pedido.destino;
+                    let articulosPedidos = pedido.pedido.split(";");
+                    try {
+                        // ARMADO PDF
+                        const doc = new jsPDF();
+                        var image = new Image()
+                        const font = 'Arial';
+                        const backgroundColor = '#F2F2F2'; // Color de fondo gris claro
+                        doc.setFont(font);
+    
+                        image.src = 'img/logohor.jpg'
+    
+                        doc.addImage(image,80,10,50,16)
+    
+                        doc.setFontSize(11);
+                        doc.text(175, 35, fecha );
+                        
+                        doc.setFontSize(12);
+                        doc.text(20, 45, 'Nuevo pedido de: ');
+                        doc.setFontSize(13);
+                        doc.text(20, 53, merendero.toUpperCase());
+                        
+                        doc.setFontSize(13);
+                        doc.setFillColor(backgroundColor);
+                        doc.rect(20, 60, 173, 7, 'F'); // Rectángulo de fondo gris claro
+                        doc.text(20, 65, 'DATOS DE ENVIO');
+                        doc.line(20,67,193,67);
+    
+                        
+                        doc.setFontSize(10);
+    
+                        doc.setFontType('bold');
+                        doc.text(20, 75, 'Voluntario:');
+    
+                        doc.setFontType('regular');
+                        doc.text(50, 75, voluntario);
+    
+    
+                        doc.setFontType('bold');
+                        doc.text(20, 82, 'Dirección: ');
+    
+                        doc.setFontType('regular');
+                        doc.text(50, 82, direccion);    
+    
+                        doc.setFontType('bold');
+                        doc.text(20, 89, 'Ciudad/Provincia: ');
+    
+                        doc.setFontType('regular');
+                        doc.text(50, 89, ciudad + " / " +provincia);
+                        
+    
+                        doc.setFontType('bold');
+                        doc.text(20, 96, 'Código postal: ');
+    
+                        doc.setFontType('regular');
+                        doc.text(50, 96, codigoPostal);
+    
+    
+                        doc.setFontType('bold');
+                        doc.text(20, 103, 'Teléfono:');
+    
+                        doc.setFontType('regular');
+                        doc.text(50, 103, telefono);
+    
+    
+                        doc.setFontSize(13);
+                        doc.setFillColor(backgroundColor);
+                        doc.rect(20, 110, 173, 7, 'F'); // Rectángulo de fondo gris claro
+                        if (destino == "biblioteca") {
+                            doc.text(20, 115, 'LIBROS PEDIDOS');
+                        } else if (destino == "recursos") {
+                            doc.text(20, 115, 'RECURSOS PEDIDOS');
+                        } else if (destino == "meriendas") {
+                            doc.text(20, 115, 'ARTICULOS PEDIDOS');
+                        } else if (destino == "materiales") {
+                            doc.text(20, 115, 'MATERIALES PEDIDOS');
+                        } else {
+                            doc.text(20, 115, 'LISTADO PEDIDO');
+                        }
+                        doc.line(20,117,193,117);
+
+                        let contador = 1;
+                        let posicionVertical = 125;
+                        let currentPage = 1;
+                        const maxWidth = doc.internal.pageSize.width - 30; // Ancho máximo del texto (margen izquierdo y derecho de 20)
+                       
+                        articulosPedidos.forEach(element => {
+                            if (element.trim() != "" && element != null) {
+                                const lines = doc.splitTextToSize(contador + ".- " + element, maxWidth);
+                                if (posicionVertical + lines.length * 7 >= doc.internal.pageSize.height - 10) {
+                                    doc.addPage();
+                                    currentPage++;
+                                    posicionVertical = 20; // Reiniciar la posición vertical en la nueva página
+                                }
+                                doc.setFontSize(10);
+                                lines.forEach(line => {
+                                    doc.text(20, posicionVertical, line);
+                                    posicionVertical += 7;
+                                });
+                                contador++;
+                            }
+                        })
+                        var pdfData = doc.output('blob');
+
+                        // Abrir el PDF en una nueva pestaña
+                        var url = URL.createObjectURL(pdfData);
+                        window.open(url);
+                    } catch (error) {
+                        this.mostrarToast("Error", "No se pudo visualizar el archivo. Intente nuevamente");
+                    }
+                },
                 formatearFecha (fecha) {
                     let dia = fecha.split(" ")[0];
-                    let hora = fecha.split(" ")[1];
+                    //let hora = fecha.split(" ")[1];
                     dia = dia.split("-").reverse().join("-");
 
-                    return dia + "  " + hora + "hs";
+                    return dia ;
                 },
                 irAHome () {
                     window.location.href = 'home.php';    
@@ -300,6 +522,13 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         tituloToast.className = "errorModal";
                     }
                 },
+                ocultarToast() {
+                    this.tituloToast = "";
+                    this.textoToast = "";
+                    var toast = document.getElementById("mitoast");
+                    toast.classList.remove("mostrar");
+                    toast.classList.add("toast");
+                }
             }
         })
         window.addEventListener('scroll', function(evt) {

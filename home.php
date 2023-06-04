@@ -4,6 +4,10 @@ if (!$_SESSION["login"] ) {
     header("Location: index.html");
 }
 
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 01 Jan 2000 00:00:00 GMT");
+header("Pragma: no-cache");
+
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +66,7 @@ if (!$_SESSION["login"] ) {
                         Otros recursos
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('pedidos')" v-if="rol =='admin'">
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('pedidos')" v-if="rol =='admin' || rol =='superAdmin'">
                     <div class="opciones">
                         Pedidos <br>realizados
                     </div>
@@ -114,38 +118,37 @@ if (!$_SESSION["login"] ) {
                 
             },
             data: {
-                items: [
-                    { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-                    { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-                    { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                    { age: 38, first_name: 'Jami', last_name: 'Carney' }
-                ],
                 rol: ""
             },
             mounted() {
                 this.rol = "<?php echo $_SESSION["rol"]; ?>";
-                console.log(this.rol);
             },
             methods:{
                 irA(param) {
                     switch (param) {
                         case "materiales":
-                            window.location.href = 'materiales.php';        
+                            localStorage.setItem("perfil", "materiales")     
+                            window.location.href = 'materiales.php';   
                             break;
                     
                         case "biblioteca":
-                            window.location.href = 'biblioteca.php';        
+                            localStorage.setItem("perfil", "biblioteca") 
+                            window.location.href = 'banco.php';        
+                            break;
+                        
+                        case "recursos":
+                            localStorage.setItem("perfil", "recursos") 
+                            window.location.href = 'banco.php';         
                             break;
 
                         case "planificaciones":
-                            window.location.href = 'planificaciones.php';        
+                            localStorage.setItem("perfil", "planificaciones") 
+                            window.location.href = 'banco.php';        
                             break;
 
-                        case "recursos":
-                            window.location.href = 'recursos.php';         
-                            break;
 
                         case "merienda":
+                            localStorage.setItem("perfil", "meriendas") 
                             window.location.href = 'meriendas.php';         
                             break;
 

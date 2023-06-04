@@ -34,6 +34,10 @@ session_start();
                     $res["mensaje"] = $mensaje;
                     $res["error"] = false;
                     $res["token"] = $token;
+
+                    if($usuario == "marcos@fundacionsi.org.ar"){
+                        $_SESSION["rol"] = "superAdmin";
+                    }
             }  else {
                 if ($usuario != 'sipueden@fundacionsi.org.ar' && $password != 30712506829) {
                     $error = "Los datos ingresados son incorrectos";

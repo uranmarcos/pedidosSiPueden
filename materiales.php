@@ -3,6 +3,14 @@ session_start();
 if (!$_SESSION["login"] ) {
     header("Location: index.html");
 }
+if(time() - $_SESSION['login_time'] >= 1000){
+    session_destroy(); // destroy session.
+    header("Location: index.html");
+    die(); 
+} else {        
+   $_SESSION['login_time'] = time();
+}
+$_SESSION["pedido"] = "materiales";
 
 ?>
 
@@ -30,15 +38,17 @@ if (!$_SESSION["login"] ) {
         <div class="container">
             <!-- START BREADCRUMB -->
             <div class="col-12 p-0">
-                    <div class="breadcrumb">
-                        <span class="pointer mr-2" @click="irAHome()">Inicio</span>  -  <span class="ml-2 grey"> Pedido de materiales </span>
-                    </div>
+                <div class="breadcrumb">
+                    <span class="pointer mx-2" @click="irA('home')">Inicio</span> 
+                        -  
+                    <span class="mx-2 grey"> Materiales </span>
                 </div>
-                <!-- END BREADCRUMB -->
+            </div>
+            <!-- END BREADCRUMB -->
 
             <div class="row mt-6">
                 <div class="col-12">
-                    <div class="card" v-if="!pedido">
+                    <!-- <div class="card" v-if="!pedido">
                         <span class="subtituloCard">DATOS PARA EL ENVIO</span>
                         <div class="px-3 mt-3 row">
                             <div class="col-sm-12 col-md-6">
@@ -105,9 +115,9 @@ if (!$_SESSION["login"] ) {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <div class="card" v-if="pedido">
+                    <div class="card">
                         <span class="subtituloCard">LISTADO DE MATERIALES</span>
                         <div class="row rowListado contenedorPrincipal" >             
                             <!-- START LISTADO CATEGORIAS NORMAL -->
@@ -201,80 +211,12 @@ if (!$_SESSION["login"] ) {
                         </div>
                      
                         <div class="mt-3 row rowBotones p-3">
-                            <button type="button" @click="pedido = false" class="btn boton">
-                                Volver
-                            </button>
-                            <button type="button" :disabled="habilitarBtnEnviar()" class="btn boton" data-toggle="modal" data-target="#Modal">
-                                Enviar
+                            <button type="button" :disabled="habilitarBtnEnviar()" class="botonGeneral" @click="continuar">
+                                CONTINUAR
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Modal -->
-                <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header  d-flex justify-content-center">
-                                <h5 class="modal-title" id="ModalLabel">CONFIRMACIÓN</h5>
-                            </div>
-
-                            <div class="modal-body row d-flex justify-content-center" v-if="!errorEnvio && !pedidoEnviado">
-                                <div class="col-12 confirmacion">
-                                    ¿Desea enviar el pedido?
-                                </div>    
-                                <div class="col-12 copia">
-                                    <input type="checkbox" @click="mailCopia = null" v-model="enviarCopia">
-                                    <label>Quiero recibir una copia en mi correo</label>
-                                </div>                              <br>    
-                                <div class="col-12" v-if="enviarCopia">
-                                    <input class="inputCopia" :class="errorMail ? 'inputError' : ''" type="text" v-model="mailCopia">
-                                </div>
-                            </div>
-
-                            <div class="modal-body row d-flex justify-content-center" v-if="errorEnvio">
-                                <div class="col-12 confirmacion">
-                                    Hubo un error y el pedido no se pudo enviar. Por favor intente nuevamente.
-                                </div>    
-                            </div>
-
-                            <div class="modal-body row d-flex justify-content-center" v-if="pedidoEnviado && !errorEnvio">
-                                <div class="col-12 confirmacion">
-                                    ¡El pedido se envió correctamente! :)
-                                </div>    
-                            </div>
-                            
-
-                            <div class="modal-footer d-flex justify-content-between" v-if="!pedidoEnviado">
-                                <button type="button" class="btn boton" @click="errorEnvio =false" :disabled="loading" data-dismiss="modal">Cancelar</button>
-                                
-                                <button type="button" @click="confirmar()" class="btn boton" v-if="!loading">
-                                    Confirmar
-                                </button>
-
-                                <button 
-                                    class="btn boton"
-                                    v-if="loading" 
-                                >
-                                    <div class="loading">
-                                        <div class="spinner-border" role="status">
-                                            <span class="sr-only"></span>
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <div class="modal-footer d-flex justify-content-center" v-if="!errorEnvio && pedidoEnviado">
-
-                                <button type="button" @click="terminar()" class="btn boton" v-if="!loading">
-                                    Aceptar
-                                </button>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-              
+                </div>              
             </div>
         </div>
         
@@ -315,6 +257,10 @@ if (!$_SESSION["login"] ) {
         .destacado:hover{
             cursor: pointer;
         }
+        .rowBotones{
+            display: flex;
+            justify-content: end;
+        }
     </style>
     <script>
         var app = new Vue({
@@ -323,26 +269,6 @@ if (!$_SESSION["login"] ) {
                 
             },
             data: {
-                loading: false,
-                recordarDatos: false,
-                pedido: false,
-                envio: {
-                    nombre: null,
-                    nombreVoluntario: null,
-                    direccion: null,
-                    ciudad: null,
-                    provincia: null,
-                    codigoPostal: null,
-                    caracteristica: null,
-                    telefono: null,
-                },
-                errorNombre: null,
-                errorDireccion: null,
-                errorCiudad: null,
-                errorProvincia: null,
-                errorTelefono: null,
-                errorCodigoPostal: null,
-                errorNombreVoluntario: null,
                 listadoPedido: [
                     {medible: true, categoria: "afiches", nombre: "Afiche amarillo", descripcion: "Amarillo", cantidad: null},
                     {medible: true, categoria: "afiches", nombre: "Afiche azul", descripcion: "Azul", cantidad: null},
@@ -453,58 +379,12 @@ if (!$_SESSION["login"] ) {
                     {id: "otros", descripcion: "OTROS"}
                 ],
                 titulo: null,
-                textoToast: null,
-                mailCopia: null,
-                enviarCopia: false,
-                errorMail: false,
-                errorEnvio: false,
-                pedidoEnviado: false,
-                provincias: [
-                    "Buenos Aires",
-                    "CABA",
-                    "Catamarca",
-                    "Chaco",
-                    "Chubut",
-                    "Córdoba",
-                    "Corrientes",
-                    "Entre Ríos",
-                    "Formosa",
-                    "Jujuy",
-                    "La Pampa",
-                    "La Rioja",
-                    "Mendoza",
-                    "Misiones",
-                    "Neuquén",
-                    "Río Negro",
-                    "Salta",
-                    "San Juan",
-                    "San Luis",
-                    "Santa Cruz",
-                    "Santa Fe",
-                    "Santiago del Estero",
-                    "Tierra del Fuego",
-                    "Tucumán"
-                ]
             },
             mounted () {
                 // CARGO SI TENGO EL PEDIDO EN LOCAL STORAGE
                 let listadoPedido = JSON.parse(localStorage.getItem("listadoPedido"));
                 if (listadoPedido) {
                     this.listadoPedido = listadoPedido;
-                }
-                let envio = JSON.parse(localStorage.getItem("datosEnvio"));
-                if (envio) {
-                    this.envio.nombre = envio.nombre;
-                    this.envio.nombreVoluntario = envio.nombreVoluntario;
-                    this.envio.direccion = envio.direccion;
-                    this.envio.piso = envio.piso;
-                    this.envio.dpto = envio.dpto;
-                    this.envio.ciudad = envio.ciudad;
-                    this.envio.provincia = envio.provincia;
-                    this.envio.codigoPostal = envio.codigoPostal;
-                    this.envio.caracteristica = envio.caracteristica;
-                    this.envio.telefono = envio.telefono;
-                    this.recordarDatos = true;
                 }
             },
             methods:{
@@ -525,146 +405,26 @@ if (!$_SESSION["login"] ) {
                 updateLocalSotare() {
                     localStorage.setItem("listadoPedido", JSON.stringify(this.listadoPedido));
                 },
-                irAHome () {
-                    window.location.href = 'home.php';    
+                irA (destino) {
+                    switch (destino) {
+                        case "home":
+                            window.location.href = 'home.php';    
+                            break;
+                        default:
+                            break;
+                    }
                 },
                 continuar () {
-                    this.pedido = false;
-                    this.resetErrores();
-                    if (this.envio.nombre != null && this.envio.nombre.trim() != '' &&
-                        this.envio.nombreVoluntario != null && this.envio.nombreVoluntario.trim() != '' &&
-                        this.envio.direccion != null && this.envio.direccion.trim() != '' &&
-                        this.envio.ciudad != null && this.envio.ciudad.trim() != '' &&
-                        this.envio.provincia != null && this.envio.provincia.trim() != '' &&
-                        this.envio.codigoPostal != null && this.envio.codigoPostal.trim() != '' &&
-                        this.envio.caracteristica != null && this.envio.caracteristica.trim() != '' &&
-                        this.envio.telefono != null && this.envio.telefono.trim() != '')
-                        {
-                            this.pedido = true;
-                            if (this.recordarDatos) {
-                                localStorage.setItem("datosEnvio", JSON.stringify(this.envio))
-                            } else {
-                                localStorage.removeItem("datosEnvio")
-                            }
-                        } else {
-                            if (this.envio.nombre == null || this.envio.nombre.trim() == '') {
-                                this.errorNombre = "Campo requerido";
-                            }
-                            if (this.envio.nombreVoluntario == null || this.envio.nombreVoluntario.trim() == '') {
-                                this.errorNombreVoluntario = "Campo requerido";
-                            }
-                            if (this.envio.direccion == null || this.envio.direccion.trim() == '') {
-                                this.errorDireccion = "Campo requerido";
-                            }
-                            if (this.envio.ciudad == null || this.envio.ciudad.trim() == '') {
-                                this.errorCiudad = "Campo requerido";
-                            }
-                            if (this.envio.provincia == null || this.envio.provincia.trim() == '') {
-                                this.errorProvincia = "Campo requerido";
-                            }
-                            if (this.envio.codigoPostal == null || this.envio.codigoPostal.trim() == '') {
-                                this.errorCodigoPostal = "Campo requerido";
-                            }
-                            if (this.envio.caracteristica == null || this.envio.caracteristica.trim() == '' || this.envio.telefono == null || this.envio.telefono.trim() == '') {
-                                this.errorTelefono = "Campo requerido";
-                            }
-                        }
-                },
-                resetErrores() {
-                    this.errorNombre= null
-                    this.errorDireccion= null
-                    this.errorCiudad= null
-                    this.errorProvincia= null
-                    this.errorTelefono= null
-                    this.errorCodigoPostal= null                
-                },
-                validarMail (mail) {
-                    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
-                        return (true)
+                    let articulos  = []
+                    articulos = this.listadoPedido.filter(element => 
+                        element.cantidad != null && element.cantidad != false && element.cantidad != 0 );
+                    let pedido = {
+                        tipo: "materiales",
+                        articulos: articulos
                     }
-                    return (false)
-                },
-                confirmar () {
-                    this.errorMail = false;
-                    if (this.enviarCopia) {
-                        if (this.mailCopia == null || this.mailCopia.trim() == '') {
-                            this.errorMail = true;
-                            return;
-                        } else {
-                            if (!this.validarMail(this.mailCopia)) {
-                                this.errorMail = true;
-                                return;
-                            }
-                        }
-                    }
-                    this.loading= true;
-                    let formdata = new FormData();
-                    const tiempoTranscurrido = Date.now();
-                    const hoy = new Date(tiempoTranscurrido);
-                    let fecha = hoy.getDate() + "/" + (hoy.getMonth() + 1) + "/" + hoy.getFullYear();
-
-                    formdata.append("nombreSiPueden", this.envio.nombre);
-                    formdata.append("nombreVoluntario", this.envio.nombreVoluntario);
-                    formdata.append("direccionEnvio", this.envio.direccion);
                     
-                    let direccion = this.envio.direccion;
-                    if (this.envio.piso != null && this.envio.piso.trim() != '') {
-                        direccion = direccion + ". Piso: " + this.envio.piso;
-                    }
-                    if (this.envio.dpto != null && this.envio.dpto.trim() != '') {
-                        direccion = direccion + ". Dpto: " + this.envio.dpto;
-                    }
-                    formdata.append("direccionEnvio", direccion);
-
-                    formdata.append("ciudad", this.envio.ciudad);
-                    formdata.append("provincia", this.envio.provincia);
-                    formdata.append("codigoPostal", this.envio.codigoPostal);
-                    formdata.append("telefono", this.envio.caracteristica + " - " + this.envio.telefono );
-                    formdata.append("fecha", fecha);
-                    formdata.append("mail", "marcos_uran@hotmail.com");
-                    // formdata.append("mail", "laurapecorelli@hotmail.com.ar");
-                    formdata.append("mailCopia", this.mailCopia);
-                    
-                    let pedido = '';
-                    let otros = "";
-                    
-                    this.listadoPedido.forEach(element => {
-                        if (element.cantidad != null && element.cantidad != false && element.cantidad != 0 && element.categoria != 'otros') {
-                            let elemento = '';
-                            if (element.medible) {
-                                elemento = element.nombre + ": " + element.cantidad + "; "; 
-                            } else {
-                                elemento = element.nombre + "; ";
-                            }
-                              
-                            pedido = pedido + elemento;
-                        }
-                        if (element.cantidad != null && element.categoria == 'otros') {
-                            otros = element.cantidad;
-                        }
-                    });
-                    formdata.append("pedido", pedido);
-                    formdata.append("otros", otros);
-                   
-                    axios.post("funciones/acciones.php?accion=enviarPedido", formdata)
-                    .then(function(response){    
-                        if (response.data.error) {
-                            app.errorEnvio= true;
-                            app.pedidoEnviado= false;
-                        } else {
-                            app.errorEnvio= false;
-                            app.pedidoEnviado= true;
-                            localStorage.removeItem("listadoPedido")
-                        }
-                        app.loading = false;
-                    }).catch( error => {
-                        app.errorEnvio= true;
-                        app.pedidoEnviado= false;
-                        app.loading = false;
-                    })                
-                },
-                terminar () {
-                    window.location.href = 'home.php'; 
+                    localStorage.setItem("pedido", JSON.stringify(pedido))
+                    window.location.href = 'envio.php';    
                 }
             }
         })

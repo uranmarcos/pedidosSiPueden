@@ -1,16 +1,22 @@
 .header{
-    background-color:  rgb(124, 69, 153);
+    /* background-color:  rgb(124, 69, 153); */
+    background-color: white;
     display: flex;
     height: 15vh;
     padding: 0 20px;
     justify-content: space-between;
     align-items: center;
+    border-bottom: rgb(124, 69, 153) 1px solid;
+}
+.imgHeader{
+    border-radius: 50%;
 }
 .imgHeader:hover{
     cursor: pointer;
 }
 .btnLogOut{
-    background-color:rgb(124, 69, 153);
+    background: white;
+    color:rgb(124, 69, 153);
     border: none;
 }
 .white{
@@ -176,6 +182,31 @@ h6{
 .boton:hover{
     color: rgb(124, 69, 153);
     box-shadow: 3px 3px 3px rgb(124, 69, 153);
+}
+
+
+
+.botonGeneral{
+    width: auto;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 0.8em;
+    color: rgb(124, 69, 153);
+    border: solid 1px rgb(124, 69, 153);
+    border-radius: 5px;
+    background: white;
+}
+.botonGeneral:hover{
+    background-color: rgb(124, 69, 153);
+    color: white;
+}
+.botonEliminar{
+    color: rgb(238, 100, 100);
+    border: solid 1px rgb(238, 100, 100);
+}
+.botonEliminar:hover{
+    color: white;
+    background: rgb(238, 100, 100);
 }
 
 .contenedorBoton{
