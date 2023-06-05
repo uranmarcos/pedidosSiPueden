@@ -273,7 +273,7 @@
                 $phpmailer->setFrom($phpmailer->Username, $from_name);
                 $address_to = $mail;
                 $phpmailer->AddAddress($address_to); // recipients email
-                $phpmailer->addBCC('marcos_uran');
+                $phpmailer->AddBCC('marcos_uran@hotmail.com');
 
                 // CONTENIDO
                 $phpmailer->IsHTML(true);
