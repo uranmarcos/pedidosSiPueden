@@ -66,6 +66,11 @@ header("Pragma: no-cache");
                         Otros recursos
                     </div>
                 </div>
+                <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('videos')">
+                    <div class="opciones">
+                        Videos
+                    </div>
+                </div>
                 <div class="col-md-4 col-sm-12 my-2 my-md-5 d-flex justify-content-center"  @click="irA('pedidos')" v-if="rol =='admin' || rol =='superAdmin'">
                     <div class="opciones">
                         Pedidos <br>realizados
@@ -143,6 +148,11 @@ header("Pragma: no-cache");
 
                         case "planificaciones":
                             localStorage.setItem("perfil", "planificaciones") 
+                            window.location.href = 'banco.php';        
+                            break;
+
+                        case "videos":
+                            localStorage.setItem("perfil", "videos") 
                             window.location.href = 'banco.php';        
                             break;
 

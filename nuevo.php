@@ -74,6 +74,13 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     NUEVO RECURSO
                 </span>
                 <span 
+                    class="opcionNav"
+                    :class="perfil == 'videos' ? 'active' : '' "
+                    @click = "cambiarPerfil('videos')"    
+                >
+                    NUEVO VIDEO
+                </span>
+                <span 
                     class="opcionNav" 
                     :class="perfil == 'planificaciones' ? 'active' : '' "
                     @click = "cambiarPerfil('planificaciones')"
@@ -86,7 +93,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
             <!-- START COMPONENTE CREACION -->
             <div class="contenedorABM">    
                 <div class="titleABM">
-                    {{perfil == "biblioteca" ? 'NUEVO LIBRO' : perfil == "recursos" ? 'NUEVO RECURSO' : "NUEVA PLANIFICACIÓN"}}
+                    {{perfil == "biblioteca" ? 'NUEVO LIBRO' : perfil == "recursos" ? 'NUEVO RECURSO' : perfil == "videos" ? 'NUEVO VIDEO' : "NUEVA PLANIFICACIÓN"}}
 
                     <button type="button" class="btn botonAgregar" @click="modal=true" >
                         AGREGAR CATEGORIA
@@ -94,14 +101,14 @@ if(time() - $_SESSION['login_time'] >= 1000){
                 </div>
 
                 <div class="row rowBotones d-flex justify-content-center">
-                    <div class="col-sm-12 col-md-3 mt-3"  v-if="perfil != 'planificaciones'">
+                    <div class="col-sm-12 col-md-3 mt-3"  v-if="perfil != 'planificaciones' && perfil != 'videos'">
                         <div class="previsualizacion">
                             <img id="imagenPrevisualizacion" src="img/sinImagen.png" alt="sin imagen">   
                         </div>
                     </div>
 
                     <div class="col-sm-12 col-md-9 mt-3">
-                        <div class="pr-3">
+                        <div class="pr-3" v-if="perfil != 'videos'">
                             <label for="nombre">
                                 {{perfil == 'planificaciones' ? 'Archivo (*)' : 'Imagen (*)'}} 
                                 <span class="errorLabel" v-if="errorImagen">
@@ -123,6 +130,15 @@ if(time() - $_SESSION['login_time'] >= 1000){
                                 
                             >
                         </div>
+                        <div class="pr-3" v-else>
+                            <label for="nombre">
+                                Link (*)
+                                <span class="errorLabel" v-if="errorImagen">
+                                    {{errorImagen}}
+                                </span>
+                            </label>    
+                            <input class="form-control" autocomplete="off" id="link" v-model="articulo.archivo">
+                        </div>
                         <div class="mt-2">
                             <label for="nombre">Nombre (*) <span class="errorLabel" v-if="errorNombre">{{errorNombre}}</span></label>
                             <input class="form-control" autocomplete="off" maxlength="60" id="nombre" v-model="articulo.nombre">
@@ -134,7 +150,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     </div>
 
                     <!-- <div class="col-sm-12"> -->
-                    <div :class="perfil == 'planificaciones' ? 'col-3' : 'col-12'">
+                    <div :class="perfil == 'planificaciones' || perfil == 'videos' ? 'col-3' : 'col-12'">
                         <div class="mt-2">
                             <label for="nombre">Categoria (*) 
                             <span class="errorLabel" v-if="errorCategoria">{{errorCategoria}}</span></label>
@@ -245,7 +261,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
                             </div>
 
                             <div class="modal-body row d-flex justify-content-center">
-                                ¿Desea crear {{perfil == 'biblioteca' ? ' el libro' : perfil == 'recursos' ? ' el recurso' : ' la planificación'}}?
+                                ¿Desea crear {{perfil == 'biblioteca' ? ' el libro' : perfil == 'videos' ? ' el video' : perfil == 'recursos' ? ' el recurso' : ' la planificación'}}?
                                 
                             </div>
 
@@ -304,7 +320,7 @@ if(time() - $_SESSION['login_time'] >= 1000){
             color: white;
         } 
         .opcionNav{
-            width: 33.3%;
+            width: 25%;
             border-bottom: solid 1px grey;
             display: flex;
             justify-content: center;
@@ -490,9 +506,10 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     this.articulo.descripcion = null;
                     this.articulo.nombreImagen = "",
                     this.articulo.categoria = null;
+                    this.articulo.archivo = null;
                     this.pdfbase64 = null;
                     this.archivo = null;
-                    if (this.perfil != 'planificaciones') {
+                    if (this.perfil != 'planificaciones' && this.perfil != 'videos') {
                         $imagenPrevisualizacion = document.querySelector("#imagenPrevisualizacion");
                         $imagenPrevisualizacion.src = "img/sinImagen.png";
                     }
@@ -510,6 +527,10 @@ if(time() - $_SESSION['login_time'] >= 1000){
                             break;
                         
                         case "biblioteca":
+                            window.location.href = 'banco.php';    
+                            break;
+
+                        case "videos":
                             window.location.href = 'banco.php';    
                             break;
 
@@ -536,6 +557,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         formdata.append("recurso", "libros");
                     } else if (this.perfil == "recursos") {
                         formdata.append("recurso", "recurso");
+                    } else if (this.perfil == "videos") {
+                        formdata.append("recurso", "videos");
                     } else {
                         formdata.append("recurso", "planificaciones");
                     }
@@ -548,7 +571,6 @@ if(time() - $_SESSION['login_time'] >= 1000){
                             app.categorias.forEach(element => {
                                 element.checked = false;
                             });
-                            console.log(app.categorias);
                         }
                         app.buscandoCategorias = false;
                     })
@@ -603,6 +625,8 @@ if(time() - $_SESSION['login_time'] >= 1000){
                         formdata.append("tipo", "libros");
                     } else if (this.perfil == "recursos") {
                         formdata.append("tipo", "recurso");
+                    } else if (this.perfil == "videos") {
+                        formdata.append("tipo", "videos");
                     } else {
                         formdata.append("tipo", "planificaciones");
                     }
@@ -686,6 +710,9 @@ if(time() - $_SESSION['login_time'] >= 1000){
                     }
                     if (this.perfil == 'planificaciones') {
                         formdata.append("tipo", "planificaciones");
+                    }
+                    if (this.perfil == 'videos') {
+                        formdata.append("tipo", "videos");
                     }
 
                     let categorias = "-";

@@ -51,7 +51,7 @@ $_SESSION["pedido"] = "biblioteca";
                 <div class="breadcrumb">
                     <span class="pointer mx-2" @click="irA('home')">Inicio</span> 
                     -  
-                    <span class="mx-2 grey"> {{perfil == 'biblioteca' ? 'Biblioteca' : perfil == 'recursos' ?  'Recursos' : 'Planificaciones'}} </span>
+                    <span class="mx-2 grey"> {{perfil == 'biblioteca' ? 'Biblioteca' : perfil == 'recursos' ?  'Recursos' : perfil == 'videos' ?  'Videos' : 'Planificaciones'}} </span>
                 </div>
             </div>
             <!-- END BREADCRUMB -->         
@@ -65,8 +65,8 @@ $_SESSION["pedido"] = "biblioteca";
                     </select>
                 </div>
 
-                <div class="col-12 col-sm-6 col-md-4 px-0 mt-2 mt-md-0" v-if="perfil != 'planificaciones'">
-                    <div class="row rowBuscador d-flex justify-content-end justify-content-md-center">
+                <div class="col-12 col-sm-6 col-md-4 px-0 mt-2 mt-md-0" v-if="perfil != 'planificaciones' && perfil != 'videos'">
+                    <div class="row rowBuscador d-flex justify-content-center justify-content-md-end ">
                         <input class="form-control buscador" @keypress="changeBuscador(event)" :disabled="busquedaActiva" placeholder="Buscar" autocomplete="off" maxlength="60" id="buscador" v-model="buscador">
                         <button type="button" @click="buscarObjeto" class="mx-2 botonGeneral botonBuscar" v-if="buscador.trim().length >= 3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -84,7 +84,7 @@ $_SESSION["pedido"] = "biblioteca";
 
                 <div class="col-12 col-md-4 px-0 d-flex justify-content-end mt-2 mt-md-0" v-if="rol == 'admin' || rol == 'superAdmin'">
                     <button type="button" class="botonGeneral" @click="irA('nuevo')" >
-                        {{perfil == 'biblioteca' ? 'NUEVO LIBRO' : perfil == 'recursos' ? 'NUEVO RECURSO' : 'NUEVA PLANIFICACIÓN' }}
+                        {{perfil == 'biblioteca' ? 'NUEVO LIBRO' : perfil == 'recursos' ? 'NUEVO RECURSO' : perfil == 'videos' ? 'NUEVO VIDEO' : 'NUEVA PLANIFICACIÓN' }}
                     </button>
                 </div>
                 
@@ -113,14 +113,14 @@ $_SESSION["pedido"] = "biblioteca";
 
                                 <article class="col-12" v-for="(objeto, index) in objetos">
                                     <div class="row rowCard">
-                                        <div class="col-12 col-sm-3 p-0" :id="'objeto' + objeto.id"  v-if="perfil != 'planificaciones'">
+                                        <div class="col-12 col-sm-3 p-0" :id="'objeto' + objeto.id"  v-if="perfil != 'planificaciones' && perfil != 'videos'">
                                             <div class="imgCard">
                                                 <img  :src="retornarImagen(objeto)"/>    
                                             </div>
                                         </div>
                                         <div 
                                             class="col-12  px-3 mt-2 mt-md-0" 
-                                            :class="perfil != 'planificaciones' ? 'col-sm-6 col-md-7' : 'col-sm-9 col-md-10'" 
+                                            :class="(perfil != 'planificaciones' && perfil != 'videos') ? 'col-sm-6 col-md-7' : 'col-sm-9 col-md-10'" 
                                             :id="'descripcion' + objeto.id"
                                         >
                                             <div class="descripcionCard">
@@ -130,6 +130,7 @@ $_SESSION["pedido"] = "biblioteca";
                                                 <div class="descripcionObjeto">
                                                     {{objeto.descripcion}}
                                                 </div>
+                                                
                                             </div>
                                         </div>
                                         <div 
@@ -170,7 +171,7 @@ $_SESSION["pedido"] = "biblioteca";
                                                 type="button" 
                                                 class="boton botonAgregar" 
                                                 @click="agregarACarrito(objeto, index)" 
-                                                v-if="!objeto.agregado && perfil != 'planificaciones'"
+                                                v-if="!objeto.agregado && (perfil != 'planificaciones' && perfil != 'videos')"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
                                                     <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z"/>
@@ -183,7 +184,7 @@ $_SESSION["pedido"] = "biblioteca";
                                                 type="button" 
                                                 class="boton botonEliminar" 
                                                 @click="eliminarDeCarrito(objeto.id, objeto.nombre, index)" 
-                                                v-if="objeto.agregado && perfil != 'planificaciones'"
+                                                v-if="objeto.agregado && perfil != 'planificaciones' && perfil != 'videos'"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-dash" viewBox="0 0 16 16">
                                                     <path d="M6.5 7a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4z"/>
@@ -208,6 +209,16 @@ $_SESSION["pedido"] = "biblioteca";
                                                 data-toggle="modal" 
                                                 data-target="#ModalCategoria"
                                                 v-if="perfil == 'planificaciones'"    
+                                            >
+                                                VER
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                class="boton botonAgregar" 
+                                                @click="verVideo(objeto.archivo)" 
+                                                data-toggle="modal" 
+                                                data-target="#ModalCategoria"
+                                                v-if="perfil == 'videos'"    
                                             >
                                                 VER
                                             </button>
@@ -684,6 +695,9 @@ $_SESSION["pedido"] = "biblioteca";
                         app.mostrarToast("Error", "Hubo un error al recuperar la información. Actualice la página");
                     }
                 },
+                verVideo(link) {
+                    window.open(link, "_blank");
+                },
                 cargarPedido() {
                     let pedido = JSON.parse(localStorage.getItem("pedido"));
                     if (pedido) {
@@ -818,6 +832,9 @@ $_SESSION["pedido"] = "biblioteca";
                     if (this.perfil == 'planificaciones') {
                         formdata.append("recurso", "planificaciones");
                     }
+                    if (this.perfil == 'videos') {
+                        formdata.append("recurso", "videos");
+                    }
                     axios.post("funciones/acciones.php?accion=getCategorias", formdata)
                     .then(function(response){
                         app.buscandoCategorias = false;
@@ -841,6 +858,9 @@ $_SESSION["pedido"] = "biblioteca";
                     }
                     if (this.perfil == 'planificaciones') {
                         formdata.append("tipo", "planificaciones");
+                    }
+                    if (this.perfil == 'videos') {
+                        formdata.append("tipo", "videos");
                     }
 
                     axios.post("funciones/acciones.php?accion=contarObjetos", formdata)
@@ -871,6 +891,9 @@ $_SESSION["pedido"] = "biblioteca";
                     if (this.perfil == 'planificaciones') {
                         formdata.append("tipo", "planificaciones");
                     }
+                    if (this.perfil == 'videos') {
+                        formdata.append("tipo", "videos");
+                    }
 
                     if (this.page == 1) {
                         formdata.append("inicio", 0);
@@ -881,7 +904,6 @@ $_SESSION["pedido"] = "biblioteca";
 
                     return axios.post("funciones/acciones.php?accion=getObjetos", formdata)
                     .then(function(response){   
-                        console.log(response.data); 
                         app.buscandoObjetos = false;
                         if (response.data.error) {
                             app.mostrarToast("Error", response.data.mensaje);
@@ -891,7 +913,7 @@ $_SESSION["pedido"] = "biblioteca";
                                 if (app.perfil != 'planificaciones') {
                                     app.objetos.forEach(element => {
                                         element.agregado = false;
-                                        if (element.archivo !== null) {
+                                        if (element.archivo !== null && app.perfil != 'videos') {
                                             const blob = app.dataURItoBlob(element.archivo)
                                             const url = URL.createObjectURL(blob)
                                             element.archivo = url
@@ -904,7 +926,6 @@ $_SESSION["pedido"] = "biblioteca";
                         }
                     });
                 },
-
                 /////
                 buscarObjeto() {
                     this.page = 1;

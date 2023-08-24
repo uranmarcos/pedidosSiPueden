@@ -183,6 +183,9 @@
                 if ($tipo == "recurso") {
                     $res["mensaje"] = "El recurso se guardó correctamente";
                 }
+                if ($tipo == "videos") {
+                    $res["mensaje"] = "El video se guardó correctamente";
+                }
             } else {
                 $res["mensaje"] = "No se pudo guardar el archivo. Intente nuevamente";
                 $res["error"] = true;
